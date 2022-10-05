@@ -1,0 +1,136 @@
+@startuml RelationalDB
+  entity ChangeStatus {
+    CDOTypeId: string
+    ChangeStatusId: string
+    ChangeCount: number //copy from instance
+    LastChangeDate: Date
+    LastChangeDateGMT: string
+    ParentId: string //previos ChangeStatusId
+    Action: enum(CREATE, UPDATE, DELETED)
+    EmployeeId: string
+  }
+
+  entity Employee {
+    CDOTypeId: string
+    ChangeStatusId: string
+    ChangeCount: number
+
+    EmployeeId: string
+    EmployeeName: string
+    EmailAddress: string
+    FullName: string
+    Description: string
+    CanLogin: string
+    OrganizationId: string
+  }
+
+  entity EmployeeLoginInfo {
+    CDOTypeId: string
+    ChangeStatusId: string
+    ChangeCount: number
+
+    EmployeeLoginInfoId: string
+    LastLoginDateGMT: string
+  }
+
+  entity EmployeeRole {
+    CDOTypeId: string
+    ChangeCount: number
+
+    EmployeeRoleId: string
+    EmployeeId: string
+    RoleId: string
+    OrganizationId: string
+  }
+
+  entity SessionsValue {
+    CDOTypeId: string
+    ChangeStatusId: string
+    ChangeCount: number
+    
+    SessionsValueId: string
+    WorkCenterId: string
+    WorkCenterIconId: string
+    WorkstationId: string
+    ResourceId: string
+    OperationId: string
+    LocationIconId: string
+    FactoryId: string
+    EnterpriseIconId: string
+  }
+
+  entity RolePermission {
+    CDOTypeId: string
+    ChangeCount: number
+
+    RoleId: string
+    RolePermissionId: string
+    RolePermissionName: string
+    PermissionType: enum(
+      ChangeManagement, 
+      Container, 
+      General, 
+      Inquiry, 
+      Modelling, 
+      ModellingAdvanced, 
+      PortalConfiguration, 
+      PortalPage, 
+      Quality, 
+      SecurityAdministrator, 
+      Shopfloor, 
+      System
+    )
+  }
+
+  entity Role {
+    CDOTypeId: string
+    ChangeStatusId: string
+    ChangeCount: number
+
+    RoleId: string
+    RoleName: string
+    Description: string
+    RoleType: enum(ChangeManagement, Quality, Shopfloor)
+  }
+
+  entity Enterprise {
+    CDOTypeId: string
+    ChangeStatusId: string
+    ChangeCount: number
+
+    EnterpriseId: string
+    EnterpriseName: string
+    Description: string
+    TrainingRequirementGroupId: string
+  }
+
+  entity Factory {
+    CDOTypeId: string
+    ChangeStatusId: string
+    ChangeCount: number
+
+    FactoryId: string
+    FactoryName: string
+    FactoryCode: string
+    Description: string
+    Address: string
+    PhoneNumber: string
+    Email: string
+    Description: string
+  }
+
+  Employee --|{ SessionsValue
+  Employee --|{ EmployeeLoginInfo
+  Employee --|{ EmployeeRole
+  Role --|{ EmployeeRole
+  Role --|{ RolePermission
+  Enterprise --|{ Factory
+
+
+  Employee --|{ ChangeStatus
+  SessionsValue --|{ ChangeStatus
+  EmployeeLoginInfo --|{ ChangeStatus
+  Role --|{ ChangeStatus
+  Enterprise --|{ ChangeStatus
+  Factory --|{ ChangeStatus
+@enduml
