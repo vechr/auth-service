@@ -7,10 +7,10 @@ There's PORT for this app, Your NATS URL, and Database things
 ```
 APP_PORT=3000
 NATS_URL=nats://localhost:4222
-DB_URL="postgresql://Vechr:123@localhost:5432/things-db?schema=public"
+DB_URL="postgresql://Vechr:123@localhost:5432/auth-db?schema=public"
 ```
 
-# Running Thing Service
+# Running Auth Service
 ```bash
 yarn install
 yarn prisma:sync
