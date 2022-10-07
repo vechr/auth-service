@@ -38,11 +38,11 @@ export const generateExpiredDate = (): Date => {
 export const generateJwt = async ({
   origin,
   userId,
-  factoryCode,
+  siteCode,
 }: {
   origin: string;
   userId: string;
-  factoryCode: string;
+  siteCode: string;
 }): Promise<IGeneratedJwt> => {
   const refresh = await generateRefresh();
 
@@ -50,7 +50,7 @@ export const generateJwt = async ({
     expiresIn: appConstant.JWT_EXPIRES_IN,
     subject: translator.fromUUID(userId),
     audience: origin,
-    issuer: `vechr:${factoryCode}`,
+    issuer: `vechr:${siteCode}`,
   });
 
   const expired = generateExpiredDate();
