@@ -2,6 +2,7 @@ import { Inject, Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Session } from '@prisma/client';
 import { instanceToPlain } from 'class-transformer';
+import dayjs from 'dayjs';
 import sessionException from './session.exception';
 import PrismaService from '@/prisma/prisma.service';
 import { IContext } from '@/shared/interceptors/context.interceptor';
@@ -55,6 +56,53 @@ export default class SessionService implements OnApplicationBootstrap {
     const session = await this.db.session.create({
       data: {
         userId: user.id,
+        token: jwt.token,
+        refresh: jwt.refresh,
+        data: { user: instanceToPlain(user), headers },
+        expiredAt: jwt.expired,
+      },
+    });
+
+    return session;
+  }
+
+  public async refresh(ctx: IContext, refresh: string): Promise<Session> {
+    const user = ctx.user as TUserCustomInformation;
+
+    const headers = Object.assign({}, ctx.headers);
+
+    delete headers['authorization'];
+    delete headers['content-type'];
+    delete headers['content-length'];
+
+    const currentSession = await this.db.session.findUnique({
+      where: {
+        refresh,
+      },
+    });
+
+    if (!currentSession) {
+      throw new sessionException.InvalidRefreshToken();
+    }
+
+    if (dayjs().isAfter(currentSession.expiredAt)) {
+      throw new sessionException.RefreshTokenExpired({
+        expiredAt: dayjs(currentSession.expiredAt).format(),
+      });
+    }
+
+    const jwt = await generateJwt({
+      origin: ctx.headers?.['origin'] || 'http://localhost',
+      userId: currentSession.userId,
+      siteCode: user.siteCode,
+    });
+
+    const session = await this.db.session.update({
+      where: {
+        refresh,
+      },
+      data: {
+        userId: currentSession.userId,
         token: jwt.token,
         refresh: jwt.refresh,
         data: { user: instanceToPlain(user), headers },
