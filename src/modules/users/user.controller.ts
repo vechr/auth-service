@@ -1,15 +1,18 @@
-import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Param } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import UserService from './user.service';
 import GetUserResponse from './serializers/get-user.response';
-import GetUserValidator from './validators/get-user.validator';
-import Context from '@/shared/decorators/context.decorator';
-import { IContext } from '@/shared/interceptors/context.interceptor';
+import GetUserValidator, {
+  GetUserParamsValidator,
+} from './validators/get-user.validator';
 import SuccessResponse from '@/shared/responses/success.response';
 import Authorization from '@/shared/decorators/authorization.decorator';
 import Validator from '@/shared/decorators/validator.decorator';
 import Serializer from '@/shared/decorators/serializer.decorator';
 import Authentication from '@/shared/decorators/authentication.decorator';
 
+@ApiTags('users')
+@ApiBearerAuth('access-token')
 @Controller('users')
 export default class UserController {
   constructor(private readonly userService: UserService) {}
@@ -20,8 +23,10 @@ export default class UserController {
   @Authorization('users:read@auth')
   @Validator(GetUserValidator)
   @Serializer(GetUserResponse)
-  public async get(@Context() ctx: IContext): Promise<SuccessResponse> {
-    const result = await this.userService.get(ctx);
+  public async get(
+    @Param() params: GetUserParamsValidator,
+  ): Promise<SuccessResponse> {
+    const result = await this.userService.get(params);
 
     return new SuccessResponse('User fetch Successfully', result);
   }

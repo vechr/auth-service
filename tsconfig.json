@@ -10,8 +10,10 @@
       "@/*": ["./src/*"],
       "@modules/*": ["./src/modules/*"],
       "@shared/*": ["./src/shared/*"],
+      "@utils/*": ["./src/utils/*"],
       "@constants/*": ["./src/constants/*"]
     },
+    "strictPropertyInitialization": false,
     "resolveJsonModule": true,
     "allowJs": false,
     "declaration": true,
@@ -27,8 +29,7 @@
     "noUnusedLocals": true,
     "skipLibCheck": true,
     "strictBindCallApply": true,
-    "noFallthroughCasesInSwitch": false,
-    "strictPropertyInitialization": false
+    "noFallthroughCasesInSwitch": false
   },
   "include": ["src/*.ts", "src/**/*.ts", "database/seeds/*.ts"],
   "exclude": [

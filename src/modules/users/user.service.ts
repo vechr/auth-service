@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
-import { IContext } from '@shared/interceptors/context.interceptor';
-import { IGetUserRequestParams } from './requests/get-user.request';
 import userException from './user.exception';
+import { GetUserParamsValidator } from './validators/get-user.validator';
 import PrismaService from '@/prisma/prisma.service';
 import { TUserFullInformation } from '@/shared/types/user.type';
 
@@ -10,9 +9,7 @@ import { TUserFullInformation } from '@/shared/types/user.type';
 export default class UserService {
   constructor(private readonly db: PrismaService) {}
 
-  public async get(ctx: IContext): Promise<User> {
-    const params = ctx.params.params as IGetUserRequestParams;
-
+  public async get(params: GetUserParamsValidator): Promise<User> {
     const user = await this.findCompleteById(params.id);
 
     if (!user) {

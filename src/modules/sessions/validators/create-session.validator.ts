@@ -1,11 +1,20 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsObject, IsString, ValidateNested } from 'class-validator';
 import { ICreateSessionRequestBody } from '../requests/create-session.request';
 
-class CreateSessionBodyValidator implements ICreateSessionRequestBody {
+export class CreateSessionBodyValidator implements ICreateSessionRequestBody {
+  @ApiProperty({
+    example: 'root',
+    description: 'Insert your username in Here!',
+  })
   @IsString()
   username: string;
 
+  @ApiProperty({
+    example: 'password123',
+    description: 'Insert your Password in Here!',
+  })
   @IsString()
   password: string;
 }
