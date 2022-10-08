@@ -1,19 +1,22 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import appConstant from './constants/app.constant';
+
+import log from '@shared/utils/log.util';
+import HttpExceptionFilter from '@shared/filters/http.filter';
+import UnknownExceptionsFilter from '@shared/filters/unknown.filter';
+
 import HttpModule from './http.module';
-import NatsModule from './nats.module';
-import HttpExceptionFilter from './shared/filters/http.filter';
-import UnknownExceptionFilter from './shared/filters/unknown.filter';
+import appConstant from './constants/app.constant';
 import ContextInterceptor from './shared/interceptors/context.interceptor';
-import log from './shared/utils/log.util';
+import NatsModule from '@/nats.module';
 
 const httpServer = new Promise(async (resolve, reject) => {
   try {
     const app = await NestFactory.create(HttpModule);
+
     app.enableCors();
     app.useGlobalFilters(
-      new UnknownExceptionFilter(),
+      new UnknownExceptionsFilter(),
       new HttpExceptionFilter(),
     );
     app.useGlobalInterceptors(new ContextInterceptor());

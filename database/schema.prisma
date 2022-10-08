@@ -46,6 +46,7 @@ model User {
 }
 
 enum PermissionType {
+  Security
   ProcessModelling
   PhyscalModelling
   Shopfloor
@@ -56,7 +57,7 @@ model Permission {
   alias           String              @unique @db.VarChar(50)
   name            String              @db.VarChar(50)
   description     String?             @db.Text
-  permissionType  PermissionType
+  permissionType  PermissionType?
   role            RolesPermissions[]
 
   createdAt       DateTime            @default(now())
