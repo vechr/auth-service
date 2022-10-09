@@ -17,7 +17,7 @@ import NatsModule from '@/nats.module';
 const httpServer = new Promise(async (resolve, reject) => {
   try {
     const app = await NestFactory.create(HttpModule);
-
+    app.setGlobalPrefix('api');
     app.enableCors();
     app.useGlobalFilters(
       new UnknownExceptionsFilter(),

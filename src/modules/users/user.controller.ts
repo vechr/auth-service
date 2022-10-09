@@ -13,7 +13,7 @@ import Authentication from '@/shared/decorators/authentication.decorator';
 
 @ApiTags('User')
 @ApiBearerAuth('access-token')
-@Controller('users')
+@Controller('auth/users')
 export default class UserController {
   constructor(private readonly userService: UserService) {}
 
