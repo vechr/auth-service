@@ -17,7 +17,7 @@ import GetUserValidator, {
 } from './validators/get-user.validator';
 import ListUserValidator, {
   ListUserQueryValidator,
-} from './validators/list-topic-event.validator';
+} from './validators/list-user.validator';
 import ListUserResponse from './serializers/list-user.response';
 import CreateUserValidator, {
   CreateUserBodyValidator,
