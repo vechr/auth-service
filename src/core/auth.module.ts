@@ -5,7 +5,6 @@ import { JwtModule } from '@nestjs/jwt';
 import appConstant from '@constants/app.constant';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AuthStrategy } from './auth.strategy';
-import UserService from '@/modules/users/user.service';
 
 @Module({
   imports: [
@@ -18,6 +17,6 @@ import UserService from '@/modules/users/user.service';
       { name: appConstant.NATS_SERVICE, transport: Transport.NATS },
     ]),
   ],
-  providers: [UserService, AuthStrategy],
+  providers: [AuthStrategy],
 })
 export default class AuthModule {}

@@ -11,7 +11,7 @@ import Validator from '@/shared/decorators/validator.decorator';
 import Serializer from '@/shared/decorators/serializer.decorator';
 import Authentication from '@/shared/decorators/authentication.decorator';
 
-@ApiTags('users')
+@ApiTags('User')
 @ApiBearerAuth('access-token')
 @Controller('users')
 export default class UserController {

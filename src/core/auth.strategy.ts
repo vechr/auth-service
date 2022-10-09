@@ -3,16 +3,14 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { JsonWebTokenError } from 'jsonwebtoken';
 
-import { IDecryptedJwt, translator } from '@shared/utils/jwt.util';
+import { decryptedDataUser, IDecryptedJwt } from '@shared/utils/jwt.util';
 import appConstant from '@constants/app.constant';
-import UserService from '@modules/users/user.service';
 
 import { TUserCustomInformation } from '@/shared/types/user.type';
-import { transformUserToCustomInformation } from '@/shared/utils/user.util';
 
 @Injectable()
 export class AuthStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly userService: UserService) {
+  constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: appConstant.JWT_SECRET,
@@ -28,15 +26,12 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
   private async getCustomUser(
     jwt: IDecryptedJwt,
   ): Promise<TUserCustomInformation> {
-    const userId = translator.toUUID(jwt.sub);
-    const user = await this.userService.findCompleteById(userId);
+    const user = decryptedDataUser(jwt.payload);
 
     if (!user) {
       throw new JsonWebTokenError('sub not valid');
     }
 
-    const customUser = await transformUserToCustomInformation(user);
-
-    return customUser;
+    return user;
   }
 }

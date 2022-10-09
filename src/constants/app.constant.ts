@@ -11,6 +11,7 @@ export default Object.freeze({
     process.env.INITIAL_SUPERUSER || '{}',
   ) as Partial<User>,
   JWT_SECRET: env.get('JWT_SECRET').required().asString(),
+  ECRYPTED_SECRET: env.get('ECRYPTED_SECRET').required().asString(),
   JWT_EXPIRES_IN: env.get('JWT_EXPIRES_IN').default('3d').asString(),
   JWT_REFRESH_EXPIRES_IN: env
     .get('JWT_REFRESH_EXPIRES_IN')

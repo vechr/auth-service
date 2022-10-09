@@ -22,7 +22,7 @@ import SuccessResponse from '@/shared/responses/success.response';
 import Validator from '@/shared/decorators/validator.decorator';
 import Serializer from '@/shared/decorators/serializer.decorator';
 import Authentication from '@/shared/decorators/authentication.decorator';
-@ApiTags('sessions')
+@ApiTags('Session')
 @Controller('sessions')
 export default class SessionController {
   constructor(private readonly sessionService: SessionService) {}

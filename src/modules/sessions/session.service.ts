@@ -95,6 +95,7 @@ export default class SessionService implements OnApplicationBootstrap {
       origin: ctx.headers?.['origin'] || 'http://localhost',
       userId: currentSession.userId,
       siteCode: user.siteCode,
+      user,
     });
 
     const session = await this.db.session.update({
@@ -133,13 +134,15 @@ export default class SessionService implements OnApplicationBootstrap {
       throw new sessionException.WrongPassword();
     }
 
+    const customUser = transformUserToCustomInformation(user);
+
     const jwt = await generateJwt({
       origin: ctx.headers?.['origin'] || 'http://localhost',
       userId: user.id,
       siteCode: user.site.code,
+      user: customUser,
     });
 
-    const customUser = transformUserToCustomInformation(user);
     return { user: customUser, jwt };
   }
 }
