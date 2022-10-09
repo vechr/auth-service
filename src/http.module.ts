@@ -4,6 +4,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import UserModule from './modules/users/user.module';
 import AuthModule from './core/auth.module';
 import { SessionModule } from './modules/sessions/session.module';
+import PermissionModule from './modules/permissions/permission.module';
 import { logger } from '@/shared/utils/log.util';
 
 @Module({
@@ -17,6 +18,7 @@ import { logger } from '@/shared/utils/log.util';
 
     SessionModule,
     UserModule,
+    PermissionModule,
   ],
 })
 export default class HttpModule {}
