@@ -5,6 +5,10 @@ import userException from './user.exception';
 import { GetUserParamsValidator } from './validators/get-user.validator';
 import { TListUserRequestQuery } from './requests/list-user.request';
 import { CreateUserBodyValidator } from './validators/create-user.validator';
+import {
+  IUpdateUserRequestBody,
+  IUpdateUserRequestParams,
+} from './requests/update-user.request';
 import PrismaService from '@/prisma/prisma.service';
 import {
   TUserCustomInformation,
@@ -113,6 +117,57 @@ export default class UserService {
     } catch (error: any) {
       if (error.code === 'P2002') {
         throw new userException.DuplicateUser({ username: username });
+      }
+
+      throw error;
+    }
+  }
+
+  public async update(
+    ctx: IContext,
+    body: IUpdateUserRequestBody,
+    params: IUpdateUserRequestParams,
+  ): Promise<User> {
+    if (body.password || body.confirmPassword) {
+      if (body.password !== body.confirmPassword) {
+        throw new userException.PasswordIsNotMatch({
+          message: 'Failed create User!',
+        });
+      }
+    }
+    if (body.password !== undefined) {
+      body = {
+        ...body,
+        ...{ password: await generatePassword(body.password) },
+      };
+    }
+
+    delete body.confirmPassword;
+
+    const checkUser = await this.db.user.findUnique({
+      where: { id: params.id },
+    });
+    if (!checkUser) {
+      throw new userException.UserNotFound({ id: params.id });
+    }
+
+    try {
+      const user = await this.db.user.upsert({
+        where: { id: params.id },
+        create: { ...checkUser, ...body },
+        update: { ...checkUser, ...body },
+      });
+
+      this.auditAuth.sendAudit(ctx, AuditAction.UPDATED, {
+        id: user.id,
+        prev: checkUser,
+        incoming: user,
+      });
+
+      return user;
+    } catch (error: any) {
+      if (error.code === 'P2002') {
+        throw new userException.DuplicateUser({ username: checkUser.username });
       }
 
       throw error;

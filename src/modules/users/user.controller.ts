@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -20,6 +21,11 @@ import ListUserResponse from './serializers/list-user.response';
 import CreateUserValidator, {
   CreateUserBodyValidator,
 } from './validators/create-user.validator';
+import UpdateUserValidator, {
+  UpdateUserBodyValidator,
+  UpdateUserParamsValidator,
+} from './validators/update-user.validator';
+import UpdateUserResponse from './serializers/update-user.response';
 import SuccessResponse from '@/shared/responses/success.response';
 import Authorization from '@/shared/decorators/authorization.decorator';
 import Validator from '@/shared/decorators/validator.decorator';
@@ -64,6 +70,22 @@ export default class UserController {
     const result = await this.userService.get(params);
 
     return new SuccessResponse('User fetch Successfully', result);
+  }
+
+  @Patch(':id')
+  @HttpCode(HttpStatus.CREATED)
+  @Authentication(true)
+  @Authorization('user:update@auth')
+  @Validator(UpdateUserValidator)
+  @Serializer(UpdateUserResponse)
+  public async update(
+    @Context() ctx: IContext,
+    @Param() params: UpdateUserParamsValidator,
+    @Body() body: UpdateUserBodyValidator,
+  ): Promise<SuccessResponse> {
+    const result = await this.userService.update(ctx, body, params);
+
+    return new SuccessResponse('user fetched successfully', result);
   }
 
   @Post()
