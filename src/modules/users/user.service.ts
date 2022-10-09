@@ -174,6 +174,30 @@ export default class UserService {
     }
   }
 
+  public async delete(
+    ctx: IContext,
+    params: IUpdateUserRequestParams,
+  ): Promise<User> {
+    const currentUser = await this.db.user.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!currentUser) {
+      throw new userException.UserNotFound({ id: params.id });
+    }
+
+    const user = await this.db.user.delete({
+      where: { id: params.id },
+    });
+
+    this.auditAuth.sendAudit(ctx, AuditAction.DELETED, {
+      id: user.id,
+      prev: currentUser,
+    });
+
+    return user;
+  }
+
   public async findById(
     id: string,
     include?: Prisma.UserInclude,

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -102,5 +103,20 @@ export default class UserController {
     const result = await this.userService.create(ctx, user, body);
 
     return new SuccessResponse('user created successfully', result);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.CREATED)
+  @Authentication(true)
+  @Authorization('users:delete@auth')
+  @Validator(UpdateUserValidator)
+  @Serializer(UpdateUserResponse)
+  public async delete(
+    @Context() ctx: IContext,
+    @Param() params: UpdateUserParamsValidator,
+  ): Promise<SuccessResponse> {
+    const result = await this.userService.delete(ctx, params);
+
+    return new SuccessResponse('user deleted successfully', result);
   }
 }

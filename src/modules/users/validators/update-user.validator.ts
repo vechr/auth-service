@@ -83,7 +83,7 @@ export class UpdateUserBodyValidator implements IUpdateUserRequestBody {
 export class UpdateUserParamsValidator implements IUpdateUserRequestParams {
   @ApiProperty({
     example: '9fc509dd-2cae-433e-b9ee-705d92c56d9c',
-    description: 'Insert your User Id in Here that you want to update!',
+    description: 'Insert your User Id in Here that you want to do something!',
   })
   @IsString()
   @IsUUID()
