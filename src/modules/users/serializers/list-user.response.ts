@@ -10,8 +10,6 @@ export default class ListUserResponse implements User {
 
   description: string | null;
 
-  isCanLogin: boolean;
-
   username: string;
 
   @Exclude()

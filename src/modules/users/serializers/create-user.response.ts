@@ -1,7 +1,7 @@
-import { AuditAuth, Session, Site, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { Exclude } from 'class-transformer';
 
-export default class GetUserResponse implements User {
+export default class UserResponse implements User {
   id: string;
 
   username: string;
@@ -14,15 +14,6 @@ export default class GetUserResponse implements User {
 
   phoneNumber: string | null;
 
-  site: Site;
-
-  @Exclude()
-  sessions: Session;
-
-  @Exclude()
-  works: AuditAuth;
-
-  @Exclude()
   siteId: string;
 
   @Exclude()

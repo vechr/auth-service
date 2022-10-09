@@ -29,7 +29,6 @@
     emailAddress  String
     phoneNumber   String?
     description   String?
-    isCanLogin    Boolean
     username      String
     password      String
     ---

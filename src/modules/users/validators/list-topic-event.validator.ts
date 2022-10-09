@@ -48,13 +48,6 @@ class ListUserQueryField implements Prisma.UserWhereInput {
   @IsOptional()
   @IsObject()
   @Type(() => OperatorQuery)
-  isCanLogin?: OperatorQuery;
-
-  @Expose()
-  @ValidateNested()
-  @IsOptional()
-  @IsObject()
-  @Type(() => OperatorQuery)
   description?: OperatorQuery;
 
   @Expose()

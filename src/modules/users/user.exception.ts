@@ -20,7 +20,7 @@ class UserNotFound extends NotFoundException {
 }
 
 class DuplicateUser extends NotFoundException {
-  constructor(params: { email: string }) {
+  constructor(params: { username: string }) {
     super({
       message: 'duplicate user identifier',
       code: ESiteErrorCode.DUPLICATE_USER,

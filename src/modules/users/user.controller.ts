@@ -1,4 +1,12 @@
-import { Controller, Get, HttpCode, HttpStatus, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import UserService from './user.service';
 import GetUserResponse from './serializers/get-user.response';
@@ -9,6 +17,9 @@ import ListUserValidator, {
   ListUserQueryValidator,
 } from './validators/list-topic-event.validator';
 import ListUserResponse from './serializers/list-user.response';
+import CreateUserValidator, {
+  CreateUserBodyValidator,
+} from './validators/create-user.validator';
 import SuccessResponse from '@/shared/responses/success.response';
 import Authorization from '@/shared/decorators/authorization.decorator';
 import Validator from '@/shared/decorators/validator.decorator';
@@ -18,6 +29,8 @@ import UseList from '@/shared/decorators/uselist.decorator';
 import Context from '@/shared/decorators/context.decorator';
 import { IContext } from '@/shared/interceptors/context.interceptor';
 import { ApiFilterQuery } from '@/shared/decorators/api-filter-query.decorator';
+import User from '@/shared/decorators/user.decorator';
+import { TUserCustomInformation } from '@/shared/types/user.type';
 
 @ApiTags('User')
 @ApiBearerAuth('access-token')
@@ -51,5 +64,21 @@ export default class UserController {
     const result = await this.userService.get(params);
 
     return new SuccessResponse('User fetch Successfully', result);
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.OK)
+  @Authentication(true)
+  @Authorization('users:create@auth')
+  @Validator(CreateUserValidator)
+  @Serializer(GetUserResponse)
+  public async create(
+    @Context() ctx: IContext,
+    @User() user: TUserCustomInformation,
+    @Body() body: CreateUserBodyValidator,
+  ): Promise<SuccessResponse> {
+    const result = await this.userService.create(ctx, user, body);
+
+    return new SuccessResponse('user created successfully', result);
   }
 }

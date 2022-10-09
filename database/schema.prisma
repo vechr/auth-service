@@ -30,7 +30,6 @@ model User {
   emailAddress  String             @db.VarChar(50)
   phoneNumber   String?            @db.VarChar(15)
   description   String?            @db.Text
-  isCanLogin    Boolean            @default(true)
   username      String             @unique @db.VarChar(50)
   password      String             @db.Text
   site          Site?              @relation(fields: [siteId], references: [id])

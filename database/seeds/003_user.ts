@@ -24,7 +24,6 @@ const users = async (): Promise<TUserSeed> => [
         appConstant.INITIAL_SUPERUSER.password || 'password',
       ),
       username: appConstant.INITIAL_SUPERUSER.username,
-      isCanLogin: true,
       roles: {
         createMany: {
           data: {

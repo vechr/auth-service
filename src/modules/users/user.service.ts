@@ -1,16 +1,25 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
+import { AuditAction, Prisma, User } from '@prisma/client';
+import AuditAuthService from '../audits/audit.service';
 import userException from './user.exception';
 import { GetUserParamsValidator } from './validators/get-user.validator';
 import { TListUserRequestQuery } from './requests/list-user.request';
+import { CreateUserBodyValidator } from './validators/create-user.validator';
 import PrismaService from '@/prisma/prisma.service';
-import { TUserFullInformation } from '@/shared/types/user.type';
+import {
+  TUserCustomInformation,
+  TUserFullInformation,
+} from '@/shared/types/user.type';
 import { IContext } from '@/shared/interceptors/context.interceptor';
 import { parseMeta, parseQuery } from '@/shared/utils/query.util';
+import { generatePassword } from '@/shared/utils/password.util';
 
 @Injectable()
 export default class UserService {
-  constructor(private readonly db: PrismaService) {}
+  constructor(
+    private readonly db: PrismaService,
+    private readonly auditAuth: AuditAuthService,
+  ) {}
 
   public async list(ctx: IContext): Promise<{
     result: User[];
@@ -57,6 +66,57 @@ export default class UserService {
     }
 
     return user;
+  }
+
+  public async create(
+    ctx: IContext,
+    users: TUserCustomInformation,
+    body: CreateUserBodyValidator,
+  ): Promise<User> {
+    const {
+      fullName,
+      username,
+      description,
+      emailAddress,
+      phoneNumber,
+      confirmPassword,
+      password,
+    } = body;
+
+    if (password !== confirmPassword) {
+      throw new userException.PasswordIsNotMatch({
+        message: 'Failed create User!',
+      });
+    }
+
+    try {
+      const user = await this.db.user.create({
+        data: {
+          emailAddress,
+          fullName,
+          username,
+          description,
+          password: await generatePassword(password),
+          phoneNumber,
+          site: {
+            connect: { code: users.siteCode },
+          },
+        },
+      });
+
+      this.auditAuth.sendAudit(ctx, AuditAction.CREATED, {
+        id: user.id,
+        incoming: user,
+      });
+
+      return user;
+    } catch (error: any) {
+      if (error.code === 'P2002') {
+        throw new userException.DuplicateUser({ username: username });
+      }
+
+      throw error;
+    }
   }
 
   public async findById(
