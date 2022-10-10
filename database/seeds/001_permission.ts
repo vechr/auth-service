@@ -165,6 +165,18 @@ const permissions: TPermissionSeed = [
       permissionType: PermissionType.Security,
     },
   },
+  // Audit module
+  {
+    where: { alias: 'audit:read@auth' },
+    update: {},
+    create: {
+      id: '1cf37cb6-48a3-11ed-b878-0242ac120002',
+      alias: 'audit:read@auth',
+      name: 'read audit',
+      description: 'access to read audit',
+      permissionType: PermissionType.Security,
+    },
+  },
 ];
 
 export default permissions;
