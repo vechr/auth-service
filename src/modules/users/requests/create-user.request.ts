@@ -6,4 +6,5 @@ export interface ICreateUserRequestBody {
   username: string;
   password: string;
   confirmPassword: string;
+  roles: string[];
 }

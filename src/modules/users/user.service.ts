@@ -85,6 +85,7 @@ export default class UserService {
       phoneNumber,
       confirmPassword,
       password,
+      roles,
     } = body;
 
     if (password !== confirmPassword) {
@@ -105,7 +106,13 @@ export default class UserService {
           site: {
             connect: { code: users.siteCode },
           },
+          roles: {
+            create: roles.map((role) => ({
+              role: { connect: { id: role } },
+            })),
+          },
         },
+        include: this.includes(),
       });
 
       const auditUser: Partial<User> = user;
@@ -160,10 +167,22 @@ export default class UserService {
     delete checkAuditUser.password;
 
     try {
-      const user = await this.db.user.upsert({
+      const user = await this.db.user.update({
         where: { id: params.id },
-        create: { ...checkUser, ...body },
-        update: { ...checkUser, ...body },
+        data: {
+          fullName: body.fullName,
+          username: body.username,
+          description: body.description,
+          emailAddress: body.emailAddress,
+          password: body.password,
+          phoneNumber: body.phoneNumber,
+          roles: {
+            create: body.roles.map((role) => ({
+              role: { connect: { id: role } },
+            })),
+          },
+        },
+        include: this.includes(),
       });
 
       const auditUser: Partial<User> = user;
@@ -257,37 +276,37 @@ export default class UserService {
   }
 
   private async findCompleteBy(type: 'username' | 'id', unique: string) {
-    const includes = {
-      sessions: true,
-      works: true,
-      roles: {
-        include: {
-          role: {
-            include: {
-              permissions: {
-                include: {
-                  permission: true,
-                },
-              },
-            },
-          },
-        },
-      },
-      site: true,
-    };
-
     if (type === 'username') {
       const user = (await this.findByUsername(
         unique,
-        includes,
+        this.includes(),
       )) as TUserFullInformation;
       return user;
     }
 
     const user = (await this.findById(
       unique,
-      includes,
+      this.includes(),
     )) as TUserFullInformation;
     return user;
   }
+
+  private includes = () => ({
+    sessions: true,
+    works: true,
+    roles: {
+      include: {
+        role: {
+          include: {
+            permissions: {
+              include: {
+                permission: true,
+              },
+            },
+          },
+        },
+      },
+    },
+    site: true,
+  });
 }

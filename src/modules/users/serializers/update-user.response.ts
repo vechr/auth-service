@@ -1,5 +1,64 @@
-import { AuditAuth, Session, Site, User } from '@prisma/client';
-import { Exclude } from 'class-transformer';
+import {
+  AuditAuth,
+  Role,
+  RolesPermissions,
+  Session,
+  Site,
+  User,
+  UsersRoles,
+} from '@prisma/client';
+import { Exclude, Type } from 'class-transformer';
+
+export class UpdateRoleResponse implements Role {
+  id: string;
+
+  name: string;
+
+  description: string | null;
+
+  @Exclude()
+  permissions: RolesPermissions;
+
+  @Exclude()
+  createdAt: Date;
+
+  @Exclude()
+  updatedAt: Date;
+}
+export class UpdateUserRolesResponse implements UsersRoles {
+  @Exclude()
+  userId: string;
+
+  @Exclude()
+  roleId: string;
+
+  @Type(() => UpdateRoleResponse)
+  role: UpdateRoleResponse;
+
+  @Exclude()
+  createdAt: Date;
+
+  @Exclude()
+  updatedAt: Date;
+}
+
+export class UpdateSiteResponse implements Site {
+  id: string;
+
+  code: string;
+
+  name: string;
+
+  location: string;
+
+  description: string | null;
+
+  @Exclude()
+  createdAt: Date;
+
+  @Exclude()
+  updatedAt: Date;
+}
 
 export default class UpdateUserResponse implements User {
   id: string;
@@ -14,7 +73,11 @@ export default class UpdateUserResponse implements User {
 
   username: string;
 
-  site: Site;
+  @Type(() => UpdateUserRolesResponse)
+  roles: UpdateUserRolesResponse;
+
+  @Type(() => UpdateSiteResponse)
+  site: UpdateSiteResponse;
 
   @Exclude()
   sessions: Session;
