@@ -108,9 +108,13 @@ export default class UserService {
         },
       });
 
+      const auditUser: Partial<User> = user;
+      delete auditUser.password;
+
       this.auditAuth.sendAudit(ctx, AuditAction.CREATED, {
         id: user.id,
-        incoming: user,
+        incoming: auditUser,
+        auditable: 'user',
       });
 
       return user;
@@ -147,9 +151,13 @@ export default class UserService {
     const checkUser = await this.db.user.findUnique({
       where: { id: params.id },
     });
+
     if (!checkUser) {
       throw new userException.UserNotFound({ id: params.id });
     }
+
+    const checkAuditUser: Partial<User> = checkUser;
+    delete checkAuditUser.password;
 
     try {
       const user = await this.db.user.upsert({
@@ -158,10 +166,14 @@ export default class UserService {
         update: { ...checkUser, ...body },
       });
 
+      const auditUser: Partial<User> = user;
+      delete auditUser.password;
+
       this.auditAuth.sendAudit(ctx, AuditAction.UPDATED, {
         id: user.id,
-        prev: checkUser,
-        incoming: user,
+        prev: checkAuditUser,
+        incoming: auditUser,
+        auditable: 'user',
       });
 
       return user;
@@ -190,9 +202,13 @@ export default class UserService {
       where: { id: params.id },
     });
 
+    const auditUser: Partial<User> = currentUser;
+    delete auditUser.password;
+
     this.auditAuth.sendAudit(ctx, AuditAction.DELETED, {
       id: user.id,
-      prev: currentUser,
+      prev: auditUser,
+      auditable: 'user',
     });
 
     return user;
