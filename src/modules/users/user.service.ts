@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AuditAction, Prisma, User } from '@prisma/client';
 import AuditAuthService from '../audits/audit.service';
+import siteException from '../sites/site.exception';
 import userException from './user.exception';
 import { GetUserParamsValidator } from './validators/get-user.validator';
 import { TListUserRequestQuery } from './requests/list-user.request';
@@ -163,6 +164,16 @@ export default class UserService {
       throw new userException.UserNotFound({ id: params.id });
     }
 
+    const site = await this.db.site.findUnique({
+      where: {
+        id: body.siteId,
+      },
+    });
+
+    if (!site) {
+      throw new siteException.SiteNotFound({ id: params.id });
+    }
+
     const checkAuditUser: Partial<User> = checkUser;
     delete checkAuditUser.password;
 
@@ -177,9 +188,13 @@ export default class UserService {
           password: body.password,
           phoneNumber: body.phoneNumber,
           roles: {
+            deleteMany: {},
             create: body.roles.map((role) => ({
               role: { connect: { id: role } },
             })),
+          },
+          site: {
+            connect: { code: site.code },
           },
         },
         include: this.includes(),

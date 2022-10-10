@@ -7,6 +7,7 @@ export interface IUpdateUserRequestBody {
   password?: string;
   confirmPassword?: string;
   roles: string[];
+  siteId: string;
 }
 
 export interface IUpdateUserRequestParams {

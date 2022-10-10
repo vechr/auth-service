@@ -89,6 +89,14 @@ export class UpdateUserBodyValidator implements IUpdateUserRequestBody {
   })
   @IsArray()
   roles: string[];
+
+  @ApiProperty({
+    example: 'aa15c44d-ad6b-4bf8-b3e1-ef188761105e',
+    description: 'Attach your Site Id to User in Here!',
+  })
+  @IsString()
+  @IsOptional()
+  siteId: string;
 }
 
 export class UpdateUserParamsValidator implements IUpdateUserRequestParams {
