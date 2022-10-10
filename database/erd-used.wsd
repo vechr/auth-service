@@ -1,0 +1,95 @@
+@startuml RelationalDB
+  entity Site {
+    id            String  
+    code          String  
+    name          String  
+    location      String  
+    description   String?
+    --- 
+    createdAt     DateTime
+    updatedAt     DateTime
+  }
+
+  entity AuditAuth {
+    id          String
+    auditable   String
+    auditableId String
+    previous    Json?
+    incoming    Json?
+    action      CREATE,UPDATE,DELETE
+    userId      String
+    ---
+    createdAt   DateTime
+    updatedAt   DateTime
+  }
+
+  entity User {
+    id            String
+    fullName      String
+    emailAddress  String
+    phoneNumber   String?
+    description   String?
+    username      String
+    password      String
+    ---
+    createdAt   DateTime
+    updatedAt   DateTime
+  }
+
+  entity UsersRoles {
+    userId    String   @db.VarChar(36)
+    roleId    String   @db.VarChar(36)
+    ---
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+  }
+
+  entity Session {
+    id        String
+    user      User? 
+    userId    String
+    token     String
+    refresh   String
+    data      Json
+    expiredAt DateTime
+    ---
+    createdAt DateTime
+    updatedAt DateTime
+  }
+
+  entity RolesPermissions {
+    roleId       String  
+    permissionId String  
+    ---
+    createdAt    DateTime
+    updatedAt    DateTime
+  }
+
+  entity Permission {
+    id              String
+    alias           String
+    name            String
+    description     String?
+    permissionType  (ProcessModelling, PhyscalModelling, Shopfloor)
+    ---
+    createdAt       DateTime            @default(now())
+    updatedAt       DateTime            @updatedAt
+  }
+
+  entity Role {
+    id            String 
+    name          String 
+    description   String?
+    ---
+    createdAt     DateTime
+    updatedAt     DateTime
+  }
+  Site --|{ User
+  User --|{ Session
+  User --|{ UsersRoles
+  Role --|{ UsersRoles
+  Role --|{ RolesPermissions
+  Permission --|{ RolesPermissions
+
+  User }|-- AuditAuth
+@enduml

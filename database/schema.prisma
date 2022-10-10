@@ -1,0 +1,142 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+model Site {
+  id            String            @id @default(uuid()) @db.VarChar(36)
+  code          String            @unique @db.VarChar(15)
+  name          String            @db.VarChar(50)
+  location      String            @db.Text
+  description   String?           @db.Text
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  users         User[]
+
+  @@map("sites")
+}
+
+model User {
+  id            String             @id @default(uuid()) @db.VarChar(36)
+  fullName      String             @db.VarChar(100)
+  emailAddress  String             @db.VarChar(50)
+  phoneNumber   String?            @db.VarChar(15)
+  description   String?            @db.Text
+  username      String             @unique @db.VarChar(50)
+  password      String             @db.Text
+  site          Site?              @relation(fields: [siteId], references: [id])
+  siteId        String             @db.VarChar(36)
+  roles         UsersRoles[]
+  sessions      Session[]
+  works         AuditAuth[]
+
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@map("users")
+}
+
+enum PermissionType {
+  Security
+  ProcessModelling
+  PhyscalModelling
+  Shopfloor
+}
+
+model Permission {
+  id              String             @id @default(uuid()) @db.VarChar(36)
+  alias           String              @unique @db.VarChar(50)
+  name            String              @db.VarChar(50)
+  description     String?             @db.Text
+  permissionType  PermissionType?
+  role            RolesPermissions[]
+
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  
+  @@map("permissions")
+}
+
+model Role {
+  id            String             @id @default(uuid()) @db.VarChar(36)
+  name          String             @unique @db.VarChar(50)
+  description   String?            @db.Text
+  users         UsersRoles[]
+  permissions   RolesPermissions[]          
+
+
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  @@map("roles")
+}
+
+model RolesPermissions {
+  role         Role       @relation(fields: [roleId], references: [id])
+  roleId       String     @db.VarChar(36)
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  permissionId String     @db.VarChar(36)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@id([roleId, permissionId])
+  @@map("roles_permissions")
+}
+
+model UsersRoles {
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @db.VarChar(36)
+  role      Role     @relation(fields: [roleId], references: [id])
+  roleId    String   @db.VarChar(36)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([userId, roleId])
+  @@map("users_roles")
+}
+
+model Session {
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @db.VarChar(36)
+  token     String   @unique @db.Text
+  refresh   String   @unique @db.VarChar(255)
+  data      Json
+  expiredAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("sessions")
+}
+
+enum AuditAction {
+  CREATED
+  UPDATED
+  DELETED
+}
+
+model AuditAuth {
+  id          String      @id @default(uuid()) @db.VarChar(36)
+  auditable   String      @db.VarChar(30)
+  auditableId String      @db.VarChar(36)
+  previous    Json?
+  incoming    Json?
+  action      AuditAction
+  user        User        @relation(fields: [userId], references: [id])
+  userId      String      @db.VarChar(36)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([auditable, auditableId])
+  @@index([userId])
+  @@map("audits")
+}

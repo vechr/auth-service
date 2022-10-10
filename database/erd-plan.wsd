@@ -61,6 +61,16 @@
 
   entity RolePermission {
     CDOTypeId: string
+    ChangeStatusId: string
+    ChangeCount: number
+
+    RolePermissionId: string
+    RoleId: string
+    PermissionId: string
+  }
+
+  entity Permission {
+    CDOTypeId: string
     ChangeCount: number
 
     RoleId: string
@@ -124,6 +134,7 @@
   Employee --|{ EmployeeRole
   Role --|{ EmployeeRole
   Role --|{ RolePermission
+  Permission --|{ RolePermission
   Enterprise --|{ Factory
 
 
