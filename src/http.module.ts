@@ -6,6 +6,7 @@ import AuthModule from './core/auth.module';
 import { SessionModule } from './modules/sessions/session.module';
 import PermissionModule from './modules/permissions/permission.module';
 import SiteModule from './modules/sites/site.module';
+import RoleModule from './modules/roles/role.module';
 import { logger } from '@/shared/utils/log.util';
 
 @Module({
@@ -21,6 +22,7 @@ import { logger } from '@/shared/utils/log.util';
     UserModule,
     PermissionModule,
     SiteModule,
+    RoleModule,
   ],
 })
 export default class HttpModule {}
