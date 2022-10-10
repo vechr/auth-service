@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsArray,
   IsEmail,
   IsObject,
   IsOptional,
@@ -78,6 +79,24 @@ export class UpdateUserBodyValidator implements IUpdateUserRequestBody {
   @MinLength(3)
   @MaxLength(20)
   confirmPassword: string;
+
+  @ApiProperty({
+    example: [
+      'e9f8ed8f-3a2e-468b-9397-5da8db36ff76',
+      '1cf37cb6-48a3-11ed-b878-0242ac120002',
+    ],
+    description: 'You can attach role into this user!',
+  })
+  @IsArray()
+  roles: string[];
+
+  @ApiProperty({
+    example: 'aa15c44d-ad6b-4bf8-b3e1-ef188761105e',
+    description: 'Attach your Site Id to User in Here!',
+  })
+  @IsString()
+  @IsOptional()
+  siteId: string;
 }
 
 export class UpdateUserParamsValidator implements IUpdateUserRequestParams {

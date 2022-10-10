@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AuditAction, Prisma, User } from '@prisma/client';
 import AuditAuthService from '../audits/audit.service';
+import siteException from '../sites/site.exception';
 import userException from './user.exception';
 import { GetUserParamsValidator } from './validators/get-user.validator';
 import { TListUserRequestQuery } from './requests/list-user.request';
@@ -85,6 +86,7 @@ export default class UserService {
       phoneNumber,
       confirmPassword,
       password,
+      roles,
     } = body;
 
     if (password !== confirmPassword) {
@@ -105,12 +107,22 @@ export default class UserService {
           site: {
             connect: { code: users.siteCode },
           },
+          roles: {
+            create: roles.map((role) => ({
+              role: { connect: { id: role } },
+            })),
+          },
         },
+        include: this.includes(),
       });
+
+      const auditUser: Partial<User> = user;
+      delete auditUser.password;
 
       this.auditAuth.sendAudit(ctx, AuditAction.CREATED, {
         id: user.id,
-        incoming: user,
+        incoming: auditUser,
+        auditable: 'user',
       });
 
       return user;
@@ -147,21 +159,55 @@ export default class UserService {
     const checkUser = await this.db.user.findUnique({
       where: { id: params.id },
     });
+
     if (!checkUser) {
       throw new userException.UserNotFound({ id: params.id });
     }
 
+    const site = await this.db.site.findUnique({
+      where: {
+        id: body.siteId,
+      },
+    });
+
+    if (!site) {
+      throw new siteException.SiteNotFound({ id: params.id });
+    }
+
+    const checkAuditUser: Partial<User> = checkUser;
+    delete checkAuditUser.password;
+
     try {
-      const user = await this.db.user.upsert({
+      const user = await this.db.user.update({
         where: { id: params.id },
-        create: { ...checkUser, ...body },
-        update: { ...checkUser, ...body },
+        data: {
+          fullName: body.fullName,
+          username: body.username,
+          description: body.description,
+          emailAddress: body.emailAddress,
+          password: body.password,
+          phoneNumber: body.phoneNumber,
+          roles: {
+            deleteMany: {},
+            create: body.roles.map((role) => ({
+              role: { connect: { id: role } },
+            })),
+          },
+          site: {
+            connect: { code: site.code },
+          },
+        },
+        include: this.includes(),
       });
+
+      const auditUser: Partial<User> = user;
+      delete auditUser.password;
 
       this.auditAuth.sendAudit(ctx, AuditAction.UPDATED, {
         id: user.id,
-        prev: checkUser,
-        incoming: user,
+        prev: checkAuditUser,
+        incoming: auditUser,
+        auditable: 'user',
       });
 
       return user;
@@ -190,9 +236,13 @@ export default class UserService {
       where: { id: params.id },
     });
 
+    const auditUser: Partial<User> = currentUser;
+    delete auditUser.password;
+
     this.auditAuth.sendAudit(ctx, AuditAction.DELETED, {
       id: user.id,
-      prev: currentUser,
+      prev: auditUser,
+      auditable: 'user',
     });
 
     return user;
@@ -241,37 +291,37 @@ export default class UserService {
   }
 
   private async findCompleteBy(type: 'username' | 'id', unique: string) {
-    const includes = {
-      sessions: true,
-      works: true,
-      roles: {
-        include: {
-          role: {
-            include: {
-              permissions: {
-                include: {
-                  permission: true,
-                },
-              },
-            },
-          },
-        },
-      },
-      site: true,
-    };
-
     if (type === 'username') {
       const user = (await this.findByUsername(
         unique,
-        includes,
+        this.includes(),
       )) as TUserFullInformation;
       return user;
     }
 
     const user = (await this.findById(
       unique,
-      includes,
+      this.includes(),
     )) as TUserFullInformation;
     return user;
   }
+
+  private includes = () => ({
+    sessions: true,
+    works: true,
+    roles: {
+      include: {
+        role: {
+          include: {
+            permissions: {
+              include: {
+                permission: true,
+              },
+            },
+          },
+        },
+      },
+    },
+    site: true,
+  });
 }

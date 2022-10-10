@@ -81,6 +81,7 @@ export default class SiteService {
       this.auditAuth.sendAudit(ctx, AuditAction.CREATED, {
         id: site.id,
         incoming: site,
+        auditable: 'site',
       });
 
       return site;
@@ -117,6 +118,7 @@ export default class SiteService {
         id: site.id,
         prev: currentSite,
         incoming: site,
+        auditable: 'site',
       });
 
       return site;
@@ -149,6 +151,7 @@ export default class SiteService {
     this.auditAuth.sendAudit(ctx, AuditAction.DELETED, {
       id: site.id,
       prev: currentSite,
+      auditable: 'site',
     });
 
     return site;
