@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsArray,
   IsNotEmpty,
   IsObject,
   IsOptional,
@@ -25,6 +26,16 @@ export class CreateRoleBodyValidator implements ICreateRoleRequestBody {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiProperty({
+    example: [
+      'e9f8ed8f-3a2e-468b-9397-5da8db36ff76',
+      '1cf37cb6-48a3-11ed-b878-0242ac120002',
+    ],
+    description: 'You can attach permission into this role!',
+  })
+  @IsArray()
+  permissions: string[];
 }
 
 export default class CreateRoleValidator {

@@ -60,6 +60,13 @@ export default class RoleService {
   public async get(params: IGetRoleRequestParams): Promise<Role> {
     const role = await this.db.role.findUnique({
       where: { id: params.id },
+      include: {
+        permissions: {
+          include: {
+            permission: true,
+          },
+        },
+      },
     });
 
     if (!role) {
@@ -71,11 +78,26 @@ export default class RoleService {
 
   public async create(
     ctx: IContext,
-    body: ICreateRoleRequestBody,
+    { name, permissions, description }: ICreateRoleRequestBody,
   ): Promise<Role> {
     try {
       const role = await this.db.role.create({
-        data: body,
+        data: {
+          name,
+          description,
+          permissions: {
+            create: permissions.map((permission) => ({
+              permission: { connect: { id: permission } },
+            })),
+          },
+        },
+        include: {
+          permissions: {
+            include: {
+              permission: true,
+            },
+          },
+        },
       });
 
       this.auditAuth.sendAudit(ctx, AuditAction.CREATED, {
@@ -87,7 +109,7 @@ export default class RoleService {
       return role;
     } catch (error: any) {
       if (error.code === 'P0002') {
-        throw new roleException.DuplicateRole({ name: body.name });
+        throw new roleException.DuplicateRole({ name });
       }
 
       throw error;
@@ -97,7 +119,7 @@ export default class RoleService {
   public async update(
     ctx: IContext,
     params: IUpdateRoleRequestParams,
-    body: IUpdateRoleRequestBody,
+    { name, description, permissions }: IUpdateRoleRequestBody,
   ): Promise<Role> {
     const currentRole = await this.db.role.findUnique({
       where: { id: params.id },
@@ -108,10 +130,25 @@ export default class RoleService {
     }
 
     try {
-      const role = await this.db.role.upsert({
+      const role = await this.db.role.update({
         where: { id: params.id },
-        create: { ...currentRole, ...body },
-        update: { ...currentRole, ...body },
+        data: {
+          name: name,
+          description: description,
+          permissions: {
+            deleteMany: {},
+            create: permissions.map((permission) => ({
+              permission: { connect: { id: permission } },
+            })),
+          },
+        },
+        include: {
+          permissions: {
+            include: {
+              permission: true,
+            },
+          },
+        },
       });
 
       this.auditAuth.sendAudit(ctx, AuditAction.UPDATED, {
@@ -124,8 +161,7 @@ export default class RoleService {
       return role;
     } catch (error: any) {
       if (error.code === 'P2002') {
-        if (body.name)
-          throw new roleException.DuplicateRole({ name: body.name });
+        if (name) throw new roleException.DuplicateRole({ name });
       }
 
       throw error;
