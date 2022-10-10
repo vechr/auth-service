@@ -7,6 +7,7 @@ import { SessionModule } from './modules/sessions/session.module';
 import PermissionModule from './modules/permissions/permission.module';
 import SiteModule from './modules/sites/site.module';
 import RoleModule from './modules/roles/role.module';
+import AuditAuthModule from './modules/audits/audit.module';
 import { logger } from '@/shared/utils/log.util';
 
 @Module({
@@ -18,6 +19,7 @@ import { logger } from '@/shared/utils/log.util';
     PrismaModule,
     AuthModule,
 
+    AuditAuthModule,
     SessionModule,
     UserModule,
     PermissionModule,

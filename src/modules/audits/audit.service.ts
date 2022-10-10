@@ -1,20 +1,59 @@
-import { AuditAction } from '@prisma/client';
+import { AuditAction, AuditAuth } from '@prisma/client';
 import { Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { TAuditUpdatedPayload } from './audit-updated.type';
 import { TAuditCreatedPayload } from './types/audit-created.type';
 import { TAuditDeletedPayload } from './types/audit-deleted.type';
+import { TListAuditAuthRequestQuery } from './requests/list-audit.request';
 import log from '@/shared/utils/log.util';
 import PrismaService from '@/prisma/prisma.service';
 import { IContext } from '@/shared/interceptors/context.interceptor';
 import { publish } from '@/shared/utils/nats.util';
 import { TUserCustomInformation } from '@/shared/types/user.type';
+import { parseMeta, parseQuery } from '@/shared/utils/query.util';
 
 export default class AuditAuthService {
   constructor(
     private readonly db: PrismaService,
     @Inject('NATS_SERVICE') private readonly client: ClientProxy,
   ) {}
+
+  public async list(ctx: IContext): Promise<{
+    result: AuditAuth[];
+    meta: { count: number; total: number; page: number; totalPage: number };
+  }> {
+    const query = ctx.params.query as TListAuditAuthRequestQuery;
+
+    const { limit, offset, order, page } =
+      parseQuery<TListAuditAuthRequestQuery>(query);
+
+    const selectOptions = {
+      orderBy: order,
+      where: query.filters.field,
+    };
+
+    const pageOptions = {
+      take: limit,
+      skip: offset,
+    };
+
+    const [total, audits] = await this.db.$transaction([
+      this.db.auditAuth.count(selectOptions),
+      this.db.auditAuth.findMany({ ...pageOptions, ...selectOptions }),
+    ]);
+
+    const meta = parseMeta<AuditAuth>({
+      result: audits,
+      total,
+      page,
+      limit,
+    });
+
+    return {
+      result: audits,
+      meta,
+    };
+  }
 
   public async created(payload: TAuditCreatedPayload): Promise<void> {
     const identifier = `${payload.auditable}:${payload.auditableId}@${AuditAction.CREATED}`;
@@ -81,10 +120,12 @@ export default class AuditAuthService {
       id,
       prev,
       incoming,
+      auditable,
     }: {
       id: string;
       prev?: Record<string, any>;
       incoming?: Record<string, any>;
+      auditable?: string;
     },
   ) {
     let topic = '';
@@ -105,7 +146,7 @@ export default class AuditAuthService {
 
     if (topic) {
       await publish(this.client, topic, {
-        auditable: 'site',
+        auditable,
         auditableId: id,
         previous: prev || {},
         incoming: incoming || {},

@@ -81,6 +81,7 @@ export default class RoleService {
       this.auditAuth.sendAudit(ctx, AuditAction.CREATED, {
         id: role.id,
         incoming: role,
+        auditable: 'role',
       });
 
       return role;
@@ -117,6 +118,7 @@ export default class RoleService {
         id: role.id,
         prev: currentRole,
         incoming: role,
+        auditable: 'role',
       });
 
       return role;
@@ -149,6 +151,7 @@ export default class RoleService {
     this.auditAuth.sendAudit(ctx, AuditAction.DELETED, {
       id: role.id,
       prev: currentRole,
+      auditable: 'role',
     });
 
     return role;
