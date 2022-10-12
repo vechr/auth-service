@@ -28,6 +28,10 @@ import UpdateRoleValidator, {
 } from './validators/update-role.validator';
 import UpdateRoleResponse from './serializers/update-role.response';
 import CreateRoleResponse from './serializers/create-role.response';
+import DeleteRoleValidator, {
+  DeleteRoleParamsValidator,
+} from './validators/delete-role.validator';
+import DeleteRoleResponse from './serializers/delete-role.response';
 import Context from '@/shared/decorators/context.decorator';
 import { IContext } from '@/shared/interceptors/context.interceptor';
 import SuccessResponse from '@/shared/responses/success.response';
@@ -107,11 +111,11 @@ export default class RoleController {
   @HttpCode(HttpStatus.CREATED)
   @Authentication(true)
   @Authorization('roles:delete@auth')
-  @Validator(UpdateRoleValidator)
-  @Serializer(UpdateRoleResponse)
+  @Validator(DeleteRoleValidator)
+  @Serializer(DeleteRoleResponse)
   public async delete(
     @Context() ctx: IContext,
-    @Param() params: UpdateRoleParamsValidator,
+    @Param() params: DeleteRoleParamsValidator,
   ): Promise<SuccessResponse> {
     const result = await this.roleService.delete(ctx, params);
 

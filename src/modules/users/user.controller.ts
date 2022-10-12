@@ -27,6 +27,10 @@ import UpdateUserValidator, {
   UpdateUserParamsValidator,
 } from './validators/update-user.validator';
 import UpdateUserResponse from './serializers/update-user.response';
+import DeleteUserValidator, {
+  DeleteUserParamsValidator,
+} from './validators/delete-user.validator';
+import DeleteUserResponse from './serializers/delete-user.response';
 import SuccessResponse from '@/shared/responses/success.response';
 import Authorization from '@/shared/decorators/authorization.decorator';
 import Validator from '@/shared/decorators/validator.decorator';
@@ -109,11 +113,11 @@ export default class UserController {
   @HttpCode(HttpStatus.CREATED)
   @Authentication(true)
   @Authorization('users:delete@auth')
-  @Validator(UpdateUserValidator)
-  @Serializer(UpdateUserResponse)
+  @Validator(DeleteUserValidator)
+  @Serializer(DeleteUserResponse)
   public async delete(
     @Context() ctx: IContext,
-    @Param() params: UpdateUserParamsValidator,
+    @Param() params: DeleteUserParamsValidator,
   ): Promise<SuccessResponse> {
     const result = await this.userService.delete(ctx, params);
 

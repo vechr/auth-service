@@ -38,6 +38,10 @@ import UpdateSiteValidator, {
   UpdateSiteParamsValidator,
 } from './validators/update-site.validator';
 import UpdateSiteResponse from './serializers/update-site.response';
+import DeleteSiteValidator, {
+  DeleteSiteParamsValidator,
+} from './validators/delete-site.validator';
+import DeleteSiteResponse from './serializers/delete-site.response';
 import { ApiFilterQuery } from '@/shared/decorators/api-filter-query.decorator';
 
 @ApiTags('Site')
@@ -109,11 +113,11 @@ export default class SiteController {
   @HttpCode(HttpStatus.CREATED)
   @Authentication(true)
   @Authorization('sites:delete@auth')
-  @Validator(UpdateSiteValidator)
-  @Serializer(UpdateSiteResponse)
+  @Validator(DeleteSiteValidator)
+  @Serializer(DeleteSiteResponse)
   public async delete(
     @Context() ctx: IContext,
-    @Param() params: UpdateSiteParamsValidator,
+    @Param() params: DeleteSiteParamsValidator,
   ): Promise<SuccessResponse> {
     const result = await this.siteService.delete(ctx, params);
 

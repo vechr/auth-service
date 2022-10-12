@@ -1,5 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { AuditAction, Prisma, User } from '@prisma/client';
+import {
+  AuditAction,
+  AuditAuth,
+  Prisma,
+  Session,
+  Site,
+  User,
+} from '@prisma/client';
 import AuditAuthService from '../audits/audit.service';
 import siteException from '../sites/site.exception';
 import userException from './user.exception';
@@ -116,8 +123,12 @@ export default class UserService {
         include: this.includes(),
       });
 
-      const auditUser: Partial<User> = user;
+      const auditUser: Partial<
+        User & { sessions: Session[]; works: AuditAuth[]; site: Site | null }
+      > = user;
       delete auditUser.password;
+      delete auditUser.sessions;
+      delete auditUser.works;
 
       this.auditAuth.sendAudit(ctx, AuditAction.CREATED, {
         id: user.id,
@@ -174,8 +185,12 @@ export default class UserService {
       throw new siteException.SiteNotFound({ id: params.id });
     }
 
-    const checkAuditUser: Partial<User> = checkUser;
+    const checkAuditUser: Partial<
+      User & { sessions: Session[]; works: AuditAuth[]; site: Site | null }
+    > = checkUser;
     delete checkAuditUser.password;
+    delete checkAuditUser.sessions;
+    delete checkAuditUser.works;
 
     try {
       const user = await this.db.user.update({
@@ -200,8 +215,12 @@ export default class UserService {
         include: this.includes(),
       });
 
-      const auditUser: Partial<User> = user;
+      const auditUser: Partial<
+        User & { sessions: Session[]; works: AuditAuth[]; site: Site | null }
+      > = user;
       delete auditUser.password;
+      delete auditUser.sessions;
+      delete auditUser.works;
 
       this.auditAuth.sendAudit(ctx, AuditAction.UPDATED, {
         id: user.id,
@@ -234,10 +253,15 @@ export default class UserService {
 
     const user = await this.db.user.delete({
       where: { id: params.id },
+      include: this.includes(),
     });
 
-    const auditUser: Partial<User> = currentUser;
+    const auditUser: Partial<
+      User & { sessions: Session[]; works: AuditAuth[]; site: Site | null }
+    > = currentUser;
     delete auditUser.password;
+    delete auditUser.sessions;
+    delete auditUser.works;
 
     this.auditAuth.sendAudit(ctx, AuditAction.DELETED, {
       id: user.id,
