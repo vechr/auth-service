@@ -177,6 +177,321 @@ const permissions: TPermissionSeed = [
       permissionType: PermissionType.Security,
     },
   },
+  // Dashboard Module
+  {
+    where: { alias: 'dashboards:read@auth' },
+    update: {},
+    create: {
+      id: '8a8c7de6-8e8f-499a-bb87-9870efec29b6',
+      alias: 'dashboards:read@auth',
+      name: 'read dashboards',
+      description: 'access to read dashboards',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'dashboards:create@auth' },
+    update: {},
+    create: {
+      id: 'e663211a-49d8-11ed-b878-0242ac120002',
+      alias: 'dashboards:create@auth',
+      name: 'create dashboards',
+      description: 'access to create dashboards',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'dashboards:update@auth' },
+    update: {},
+    create: {
+      id: '17d0d53a-49d9-11ed-b878-0242ac120002',
+      alias: 'dashboards:update@auth',
+      name: 'update dashboards',
+      description: 'access to update dashboards',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'dashboards:delete@auth' },
+    update: {},
+    create: {
+      id: '23919cc4-49d9-11ed-b878-0242ac120002',
+      alias: 'dashboards:delete@auth',
+      name: 'delete dashboards',
+      description: 'access to delete dashboards',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  // Device Module
+  {
+    where: { alias: 'devices:read@auth' },
+    update: {},
+    create: {
+      id: '7447415a-49d9-11ed-b878-0242ac120002',
+      alias: 'devices:read@auth',
+      name: 'read devices',
+      description: 'access to read devices',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'devices:create@auth' },
+    update: {},
+    create: {
+      id: '79777096-49d9-11ed-b878-0242ac120002',
+      alias: 'devices:create@auth',
+      name: 'create devices',
+      description: 'access to create devices',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'devices:update@auth' },
+    update: {},
+    create: {
+      id: '7e776628-49d9-11ed-b878-0242ac120002',
+      alias: 'devices:update@auth',
+      name: 'update devices',
+      description: 'access to update devices',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'devices:delete@auth' },
+    update: {},
+    create: {
+      id: '83783594-49d9-11ed-b878-0242ac120002',
+      alias: 'devices:delete@auth',
+      name: 'delete devices',
+      description: 'access to delete devices',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  // Device Type Module
+  {
+    where: { alias: 'device-types:read@auth' },
+    update: {},
+    create: {
+      id: 'cb1add34-49d9-11ed-b878-0242ac120002',
+      alias: 'device-types:read@auth',
+      name: 'read device type',
+      description: 'access to read device type',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'device-types:create@auth' },
+    update: {},
+    create: {
+      id: 'd169fbd4-49d9-11ed-b878-0242ac120002',
+      alias: 'device-types:create@auth',
+      name: 'create device type',
+      description: 'access to create device type',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'device-types:update@auth' },
+    update: {},
+    create: {
+      id: 'd625af9c-49d9-11ed-b878-0242ac120002',
+      alias: 'device-types:update@auth',
+      name: 'update device type',
+      description: 'access to update device type',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'device-types:delete@auth' },
+    update: {},
+    create: {
+      id: 'dc144a26-49d9-11ed-b878-0242ac120002',
+      alias: 'device-types:delete@auth',
+      name: 'delete device type',
+      description: 'access to delete device type',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  // Topic Module
+  {
+    where: { alias: 'topics:read@auth' },
+    update: {},
+    create: {
+      id: '5d48c194-49da-11ed-b878-0242ac120002',
+      alias: 'topics:read@auth',
+      name: 'read topics',
+      description: 'access to read topics',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'topics:create@auth' },
+    update: {},
+    create: {
+      id: '6271088e-49da-11ed-b878-0242ac120002',
+      alias: 'topics:create@auth',
+      name: 'create topics',
+      description: 'access to create topics',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'topics:update@auth' },
+    update: {},
+    create: {
+      id: '66c4a6fc-49da-11ed-b878-0242ac120002',
+      alias: 'topics:update@auth',
+      name: 'update topics',
+      description: 'access to update topics',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'topics:delete@auth' },
+    update: {},
+    create: {
+      id: '6c2b753a-49da-11ed-b878-0242ac120002',
+      alias: 'topics:delete@auth',
+      name: 'delete topics',
+      description: 'access to delete topics',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  // Topic Event Module
+  {
+    where: { alias: 'topic-events:read@auth' },
+    update: {},
+    create: {
+      id: 'fd17648c-49da-11ed-b878-0242ac120002',
+      alias: 'topic-events:read@auth',
+      name: 'read topic event',
+      description: 'access to read topic event',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'topic-events:create@auth' },
+    update: {},
+    create: {
+      id: '01cbdfe4-49db-11ed-b878-0242ac120002',
+      alias: 'topic-events:create@auth',
+      name: 'create topic event',
+      description: 'access to create topic event',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'topic-events:update@auth' },
+    update: {},
+    create: {
+      id: '0cc549ee-49db-11ed-b878-0242ac120002',
+      alias: 'topic-events:update@auth',
+      name: 'update topic event',
+      description: 'access to update topic event',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'topic-events:delete@auth' },
+    update: {},
+    create: {
+      id: '11df5942-49db-11ed-b878-0242ac120002',
+      alias: 'topic-events:delete@auth',
+      name: 'delete topic event',
+      description: 'access to delete topic event',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  // Widget Module
+  {
+    where: { alias: 'widgets:read@auth' },
+    update: {},
+    create: {
+      id: 'd22f7fac-49da-11ed-b878-0242ac120002',
+      alias: 'widgets:read@auth',
+      name: 'read widgets',
+      description: 'access to read widgets',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'widgets:create@auth' },
+    update: {},
+    create: {
+      id: 'd76e6f96-49da-11ed-b878-0242ac120002',
+      alias: 'widgets:create@auth',
+      name: 'create widgets',
+      description: 'access to create widgets',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'widgets:update@auth' },
+    update: {},
+    create: {
+      id: 'dbc03962-49da-11ed-b878-0242ac120002',
+      alias: 'widgets:update@auth',
+      name: 'update widgets',
+      description: 'access to update widgets',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'widgets:delete@auth' },
+    update: {},
+    create: {
+      id: 'e103c416-49da-11ed-b878-0242ac120002',
+      alias: 'widgets:delete@auth',
+      name: 'delete widgets',
+      description: 'access to delete widgets',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  // Email Notification
+  {
+    where: { alias: 'email-notifications:read@auth' },
+    update: {},
+    create: {
+      id: '53febaac-49db-11ed-b878-0242ac120002',
+      alias: 'email-notifications:read@auth',
+      name: 'read email notification',
+      description: 'access to read email notification',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'email-notifications:create@auth' },
+    update: {},
+    create: {
+      id: '59f99bf2-49db-11ed-b878-0242ac120002',
+      alias: 'email-notifications:create@auth',
+      name: 'create email notification',
+      description: 'access to create email notification',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'email-notifications:update@auth' },
+    update: {},
+    create: {
+      id: '5eff2db0-49db-11ed-b878-0242ac120002',
+      alias: 'email-notifications:update@auth',
+      name: 'update email notification',
+      description: 'access to update email notification',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
+  {
+    where: { alias: 'email-notifications:delete@auth' },
+    update: {},
+    create: {
+      id: '641ecd14-49db-11ed-b878-0242ac120002',
+      alias: 'email-notifications:delete@auth',
+      name: 'delete email notification',
+      description: 'access to delete email notification',
+      permissionType: PermissionType.PhyscalModelling,
+    },
+  },
 ];
 
 export default permissions;
