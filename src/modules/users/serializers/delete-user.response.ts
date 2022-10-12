@@ -9,7 +9,7 @@ import {
 } from '@prisma/client';
 import { Exclude, Type } from 'class-transformer';
 
-export class CreateRoleResponse implements Role {
+export class DeleteRoleResponse implements Role {
   id: string;
 
   name: string;
@@ -25,15 +25,15 @@ export class CreateRoleResponse implements Role {
   @Exclude()
   updatedAt: Date;
 }
-export class CreateUserRolesResponse implements UsersRoles {
+export class DeleteUserRolesResponse implements UsersRoles {
   @Exclude()
   userId: string;
 
   @Exclude()
   roleId: string;
 
-  @Type(() => CreateRoleResponse)
-  role: CreateRoleResponse;
+  @Type(() => DeleteRoleResponse)
+  role: DeleteRoleResponse;
 
   @Exclude()
   createdAt: Date;
@@ -42,7 +42,7 @@ export class CreateUserRolesResponse implements UsersRoles {
   updatedAt: Date;
 }
 
-export class CreateSiteResponse implements Site {
+export class DeleteSiteResponse implements Site {
   id: string;
 
   code: string;
@@ -60,7 +60,7 @@ export class CreateSiteResponse implements Site {
   updatedAt: Date;
 }
 
-export default class UserResponse implements User {
+export default class DeleteUserResponse implements User {
   id: string;
 
   username: string;
@@ -73,11 +73,11 @@ export default class UserResponse implements User {
 
   phoneNumber: string | null;
 
-  @Type(() => CreateUserRolesResponse)
-  roles: CreateUserRolesResponse[];
+  @Type(() => DeleteUserRolesResponse)
+  roles: DeleteUserRolesResponse;
 
-  @Type(() => CreateSiteResponse)
-  site: CreateSiteResponse;
+  @Type(() => DeleteSiteResponse)
+  site: DeleteSiteResponse;
 
   @Exclude()
   sessions: Session;
