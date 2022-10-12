@@ -60,13 +60,7 @@ export default class RoleService {
   public async get(params: IGetRoleRequestParams): Promise<Role> {
     const role = await this.db.role.findUnique({
       where: { id: params.id },
-      include: {
-        permissions: {
-          include: {
-            permission: true,
-          },
-        },
-      },
+      include: this.includes(),
     });
 
     if (!role) {
@@ -91,13 +85,7 @@ export default class RoleService {
             })),
           },
         },
-        include: {
-          permissions: {
-            include: {
-              permission: true,
-            },
-          },
-        },
+        include: this.includes(),
       });
 
       this.auditAuth.sendAudit(ctx, AuditAction.CREATED, {
@@ -123,6 +111,7 @@ export default class RoleService {
   ): Promise<Role> {
     const currentRole = await this.db.role.findUnique({
       where: { id: params.id },
+      include: this.includes(),
     });
 
     if (!currentRole) {
@@ -142,13 +131,7 @@ export default class RoleService {
             })),
           },
         },
-        include: {
-          permissions: {
-            include: {
-              permission: true,
-            },
-          },
-        },
+        include: this.includes(),
       });
 
       this.auditAuth.sendAudit(ctx, AuditAction.UPDATED, {
@@ -174,6 +157,7 @@ export default class RoleService {
   ): Promise<Role> {
     const currentRole = await this.db.role.findUnique({
       where: { id: params.id },
+      include: this.includes(),
     });
 
     if (!currentRole) {
@@ -182,6 +166,7 @@ export default class RoleService {
 
     const role = await this.db.role.delete({
       where: { id: params.id },
+      include: this.includes(),
     });
 
     this.auditAuth.sendAudit(ctx, AuditAction.DELETED, {
@@ -192,4 +177,12 @@ export default class RoleService {
 
     return role;
   }
+
+  private includes = () => ({
+    permissions: {
+      include: {
+        permission: true,
+      },
+    },
+  });
 }
