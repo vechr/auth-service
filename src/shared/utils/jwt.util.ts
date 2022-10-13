@@ -4,9 +4,11 @@ import suuid from 'short-uuid';
 
 import appConstant from '@constants/app.constant';
 import CryptoJS from 'crypto-js';
+import { ExtractJwt } from 'passport-jwt';
 import { TUserCustomInformation } from '../types/user.type';
 import { rand, sha512 } from './security.util';
 
+const { fromExtractors, fromAuthHeaderAsBearerToken } = ExtractJwt;
 export interface IGeneratedJwt {
   refresh: string;
   token: string;
@@ -69,6 +71,23 @@ export const generateJwt = async ({
     expired,
   };
 };
+
+export const jwtOptions = {
+  jwtFromRequest: fromExtractors([
+    cookieExtractor,
+    fromAuthHeaderAsBearerToken(),
+  ]),
+  secretOrKey: appConstant.JWT_SECRET,
+  jwtCookieName: 'access-token',
+};
+
+export function cookieExtractor(req: any) {
+  let token = null;
+  if (req && req.cookies) {
+    token = req.cookies[jwtOptions.jwtCookieName];
+  }
+  return token;
+}
 
 export const encryptedDataUser = (user: TUserCustomInformation) => {
   return encodeURIComponent(

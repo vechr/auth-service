@@ -9,6 +9,7 @@ import UnknownExceptionsFilter from '@shared/filters/unknown.filter';
 import { VersioningType } from '@nestjs/common';
 import express from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import HttpModule from './http.module';
 import appConstant from './constants/app.constant';
 import ContextInterceptor from './shared/interceptors/context.interceptor';
@@ -32,6 +33,7 @@ const httpServer = new Promise(async (resolve, reject) => {
       '/api/auth/public',
       express.static(join(__dirname, '../../', 'public')),
     );
+    app.use(cookieParser());
     const option = {
       customCss: `
       .topbar-wrapper img {content:url('/api/auth/public/logo.svg'); width:200px; height:auto;}
