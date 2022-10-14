@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
@@ -28,6 +29,13 @@ import { generateExpiredDate } from '@/shared/utils/jwt.util';
 @Controller('auth/sessions')
 export default class SessionController {
   constructor(private readonly sessionService: SessionService) {}
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  @Authentication(true)
+  public async pingAuth(): Promise<SuccessResponse> {
+    return new SuccessResponse('token status ok!', true);
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
