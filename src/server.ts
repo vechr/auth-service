@@ -19,7 +19,10 @@ const httpServer = new Promise(async (resolve, reject) => {
   try {
     const app = await NestFactory.create(HttpModule);
     app.setGlobalPrefix('api');
-    app.enableCors();
+    app.enableCors({
+      credentials: true,
+      origin: true,
+    });
     app.useGlobalFilters(
       new UnknownExceptionsFilter(),
       new HttpExceptionFilter(),
