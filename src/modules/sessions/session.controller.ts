@@ -28,6 +28,16 @@ export default class SessionController {
   constructor(private readonly sessionService: SessionService) {}
 
   @ApiBearerAuth('access-token')
+  @Get('me')
+  @HttpCode(HttpStatus.OK)
+  @Authentication(true)
+  public async getMe(
+    @User() user: TUserCustomInformation,
+  ): Promise<SuccessResponse> {
+    return new SuccessResponse('success get information!', user);
+  }
+
+  @ApiBearerAuth('access-token')
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @Authentication(true)
