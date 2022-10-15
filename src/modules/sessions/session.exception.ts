@@ -4,10 +4,21 @@ import {
 } from '@shared/exceptions/common.exception';
 
 export enum ESessionErrorCode {
-  USER_NOT_FOUND = '404',
-  WRONG_PASSWORD = '401',
-  INVALID_REFRESH_TOKEN = '401',
-  REFRESH_TOKEN_EXPIRED = '401',
+  USER_NOT_FOUND = 'R404',
+  WRONG_PASSWORD = 'R401',
+  INVALID_REFRESH_TOKEN = 'R402',
+  REFRESH_TOKEN_EXPIRED = 'R403',
+  REFRESH_TOKEN_NOT_FOUND = 'R405',
+}
+
+class RefreshTokenNotFound extends NotFoundException {
+  constructor() {
+    super({
+      message:
+        'please provide refresh token, or you request login first before proceed!',
+      code: ESessionErrorCode.REFRESH_TOKEN_NOT_FOUND,
+    });
+  }
 }
 
 class UserNotFound extends NotFoundException {
@@ -53,4 +64,5 @@ export default {
   WrongPassword,
   InvalidRefreshToken,
   RefreshTokenExpired,
+  RefreshTokenNotFound,
 };

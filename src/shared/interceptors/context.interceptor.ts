@@ -10,6 +10,8 @@ export interface IContextParams {
 export interface IContext {
   headers: Record<string, any>;
   user: any;
+  accessToken?: string;
+  refreshToken?: string;
   params: IContextParams;
 }
 
@@ -20,9 +22,11 @@ export default class ContextInterceptor implements NestInterceptor {
         user: any;
         params: Record<string, any>;
         query: Record<string, any>;
+        cookies: Record<string, any>;
         customContext: IContext;
       }
     >();
+
     const context: IContext = {
       headers: request.headers,
       user: request.user,
@@ -31,6 +35,14 @@ export default class ContextInterceptor implements NestInterceptor {
         query: request.query,
         body: request.body as Record<string, any>,
       },
+      accessToken:
+        request.cookies['access-token'] === undefined
+          ? undefined
+          : request.cookies['access-token'],
+      refreshToken:
+        request.cookies['refresh-token'] === undefined
+          ? undefined
+          : request.cookies['refresh-token'],
     };
 
     request.customContext = context;

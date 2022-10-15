@@ -9,8 +9,9 @@ import { TUserCustomInformation } from '../types/user.type';
 import { log } from '../utils/log.util';
 
 enum EErrorJwtCode {
-  TOKEN_EXPIRED = '401',
-  TOKEN_INVALID = '401',
+  TOKEN_EXPIRED = 'T401',
+  TOKEN_INVALID = 'T402',
+  TOKEN_REQUIRED = 'T403',
 }
 
 export class AuthenticationGuard extends AuthGuard('jwt') {
@@ -35,6 +36,7 @@ export class AuthenticationGuard extends AuthGuard('jwt') {
       if (info.message === 'No auth token') {
         throw new UnauthorizedException({
           message: 'token required',
+          code: EErrorJwtCode.TOKEN_REQUIRED,
           params: { message: info.message },
         });
       }
