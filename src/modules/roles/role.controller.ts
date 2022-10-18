@@ -48,6 +48,18 @@ import { ApiFilterQuery } from '@/shared/decorators/api-filter-query.decorator';
 export default class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
+  @Get('all')
+  @HttpCode(HttpStatus.OK)
+  @Authentication(true)
+  @Authorization('users:read@auth')
+  @UseList()
+  @Serializer(ListRoleValidator)
+  public async getUserAll(): Promise<SuccessResponse> {
+    const result = await this.roleService.getRoleAll();
+
+    return new SuccessResponse('all user listed successfully', result);
+  }
+
   @Get()
   @HttpCode(HttpStatus.OK)
   @Authentication(true)

@@ -49,6 +49,18 @@ import { TUserCustomInformation } from '@/shared/types/user.type';
 export default class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get('all')
+  @HttpCode(HttpStatus.OK)
+  @Authentication(true)
+  @Authorization('users:read@auth')
+  @UseList()
+  @Serializer(ListUserResponse)
+  public async getUserAll(): Promise<SuccessResponse> {
+    const result = await this.userService.getUserAll();
+
+    return new SuccessResponse('all user listed successfully', result);
+  }
+
   @Get()
   @HttpCode(HttpStatus.OK)
   @Authentication(true)

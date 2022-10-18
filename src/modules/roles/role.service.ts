@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { AuditAction, Role } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import AuditAuthService from '../audits/audit.service';
 import { TListRoleRequestQuery } from './requests/list-role.request';
 import roleException from './role.exception';
@@ -12,6 +13,8 @@ import {
 import PrismaService from '@/prisma/prisma.service';
 import { IContext } from '@/shared/interceptors/context.interceptor';
 import { parseMeta, parseQuery } from '@/shared/utils/query.util';
+import log from '@/shared/utils/log.util';
+import { UnknownException } from '@/shared/exceptions/common.exception';
 
 @Injectable()
 export default class RoleService {
@@ -55,6 +58,23 @@ export default class RoleService {
       result: roles,
       meta,
     };
+  }
+
+  async getRoleAll(): Promise<Role[]> {
+    try {
+      const result = await this.db.role.findMany();
+      return result;
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        log.error(error.message);
+        throw new UnknownException({
+          code: HttpStatus.INTERNAL_SERVER_ERROR.toString(),
+          message: `Error unexpected!`,
+          params: { exception: error.message },
+        });
+      }
+      throw error;
+    }
   }
 
   public async get(params: IGetRoleRequestParams): Promise<Role> {

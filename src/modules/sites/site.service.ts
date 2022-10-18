@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { AuditAction, Site } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import AuditAuthService from '../audits/audit.service';
 import { TListSiteRequestQuery } from './requests/list-site.request';
 import { IGetSiteRequestParams } from './requests/get-site.request';
@@ -12,6 +13,8 @@ import {
 import PrismaService from '@/prisma/prisma.service';
 import { IContext } from '@/shared/interceptors/context.interceptor';
 import { parseMeta, parseQuery } from '@/shared/utils/query.util';
+import log from '@/shared/utils/log.util';
+import { UnknownException } from '@/shared/exceptions/common.exception';
 
 @Injectable()
 export default class SiteService {
@@ -55,6 +58,23 @@ export default class SiteService {
       result: sites,
       meta,
     };
+  }
+
+  async getSiteAll(): Promise<Site[]> {
+    try {
+      const result = await this.db.site.findMany();
+      return result;
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        log.error(error.message);
+        throw new UnknownException({
+          code: HttpStatus.INTERNAL_SERVER_ERROR.toString(),
+          message: `Error unexpected!`,
+          params: { exception: error.message },
+        });
+      }
+      throw error;
+    }
   }
 
   public async get(params: IGetSiteRequestParams): Promise<Site> {

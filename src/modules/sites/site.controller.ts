@@ -50,6 +50,18 @@ import { ApiFilterQuery } from '@/shared/decorators/api-filter-query.decorator';
 export default class SiteController {
   constructor(private readonly siteService: SiteService) {}
 
+  @Get('all')
+  @HttpCode(HttpStatus.OK)
+  @Authentication(true)
+  @Authorization('users:read@auth')
+  @UseList()
+  @Serializer(ListSiteResponse)
+  public async getUserAll(): Promise<SuccessResponse> {
+    const result = await this.siteService.getSiteAll();
+
+    return new SuccessResponse('all user listed successfully', result);
+  }
+
   @Get()
   @HttpCode(HttpStatus.OK)
   @Authentication(true)

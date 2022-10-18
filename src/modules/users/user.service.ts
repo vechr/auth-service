@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import {
   AuditAction,
   AuditAuth,
@@ -7,6 +7,7 @@ import {
   Site,
   User,
 } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import AuditAuthService from '../audits/audit.service';
 import siteException from '../sites/site.exception';
 import userException from './user.exception';
@@ -25,6 +26,8 @@ import {
 import { IContext } from '@/shared/interceptors/context.interceptor';
 import { parseMeta, parseQuery } from '@/shared/utils/query.util';
 import { generatePassword } from '@/shared/utils/password.util';
+import log from '@/shared/utils/log.util';
+import { UnknownException } from '@/shared/exceptions/common.exception';
 
 @Injectable()
 export default class UserService {
@@ -68,6 +71,23 @@ export default class UserService {
       result: users,
       meta,
     };
+  }
+
+  async getUserAll(): Promise<User[]> {
+    try {
+      const result = await this.db.user.findMany();
+      return result;
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        log.error(error.message);
+        throw new UnknownException({
+          code: HttpStatus.INTERNAL_SERVER_ERROR.toString(),
+          message: `Error unexpected!`,
+          params: { exception: error.message },
+        });
+      }
+      throw error;
+    }
   }
 
   public async get(params: GetUserParamsValidator): Promise<User> {

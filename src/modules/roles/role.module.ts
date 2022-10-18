@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import AuditAuthService from '../audits/audit.service';
-import RoleController from './role.contoller';
+import RoleController from './role.controller';
 import RoleService from './role.service';
 import appConstant from '@/constants/app.constant';
 
