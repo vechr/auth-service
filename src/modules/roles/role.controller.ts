@@ -53,7 +53,7 @@ export default class RoleController {
   @Authentication(true)
   @Authorization('users:read@auth')
   @UseList()
-  @Serializer(ListRoleValidator)
+  @Serializer(ListRoleResponse)
   public async getUserAll(): Promise<SuccessResponse> {
     const result = await this.roleService.getRoleAll();
 

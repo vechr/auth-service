@@ -32,7 +32,7 @@ export default class PermissionController {
   @Authentication(true)
   @Authorization('users:read@auth')
   @UseList()
-  @Serializer(ListPermissionValidator)
+  @Serializer(ListPermissionResponse)
   public async getUserAll(): Promise<SuccessResponse> {
     const result = await this.permissionService.getPermissionAll();
 
