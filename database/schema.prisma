@@ -80,7 +80,7 @@ model Role {
 }
 
 model RolesPermissions {
-  role         Role       @relation(fields: [roleId], references: [id])
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   roleId       String     @db.VarChar(36)
   permission   Permission @relation(fields: [permissionId], references: [id])
   permissionId String     @db.VarChar(36)
@@ -92,9 +92,9 @@ model RolesPermissions {
 }
 
 model UsersRoles {
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String   @db.VarChar(36)
-  role      Role     @relation(fields: [roleId], references: [id])
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
   roleId    String   @db.VarChar(36)
 
   createdAt DateTime @default(now())
