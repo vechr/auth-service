@@ -10,32 +10,58 @@ import { VersioningType } from '@nestjs/common';
 import express from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
-import HttpModule from './http.module';
+import HttpModule from './app.module';
 import appConstant from './constants/app.constant';
 import ContextInterceptor from './shared/interceptors/context.interceptor';
-import NatsModule from '@/nats.module';
 
-const httpServer = new Promise(async (resolve, reject) => {
+const appServer = new Promise(async (resolve, reject) => {
   try {
     const app = await NestFactory.create(HttpModule);
+
+    // Connect to Broker NATS
+    app.connectMicroservice<MicroserviceOptions>({
+      transport: Transport.NATS,
+      options: {
+        servers: [appConstant.NATS_URL],
+      },
+    });
+    await app
+      .startAllMicroservices()
+      .then(() =>
+        log.info(`Nest app NATS started at :${appConstant.NATS_URL} `),
+      );
+
+    // Set prefix api globally
     app.setGlobalPrefix('api');
+
+    // Enable CORS for security
     app.enableCors({
       credentials: true,
       origin: true,
     });
+
+    // Use Exception Filter
     app.useGlobalFilters(
       new UnknownExceptionsFilter(),
       new HttpExceptionFilter(),
     );
+
+    // Versioning of default URL V1
     app.enableVersioning({
       defaultVersion: '1',
       type: VersioningType.URI,
     });
+
+    // Use Global Interceptors
     app.useGlobalInterceptors(new ContextInterceptor());
+
+    // Serve public images
     app.use(
       '/api/auth/public',
       express.static(join(__dirname, '../../', 'public')),
     );
+
+    // Use Cookie for http only
     app.use(cookieParser());
     const option = {
       customCss: `
@@ -66,29 +92,9 @@ const httpServer = new Promise(async (resolve, reject) => {
 
     await app
       .listen(appConstant.APP_PORT)
-      .then(() => log.info(`http server started at :${appConstant.APP_PORT}`));
-
-    resolve(true);
-  } catch (error) {
-    reject(error);
-  }
-});
-
-const natsServer = new Promise(async (resolve, reject) => {
-  try {
-    const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-      NatsModule,
-      {
-        transport: Transport.NATS,
-        options: {
-          servers: [appConstant.NATS_URL],
-        },
-      },
-    );
-
-    await app
-      .listen()
-      .then(() => log.info(`Nest nats started at: ${appConstant.NATS_URL}`));
+      .then(() =>
+        log.info(`Nest app http started at PORT: ${appConstant.APP_PORT}`),
+      );
 
     resolve(true);
   } catch (error) {
@@ -97,5 +103,5 @@ const natsServer = new Promise(async (resolve, reject) => {
 });
 
 (async function () {
-  await Promise.all([httpServer, natsServer]);
+  await Promise.all([appServer]);
 })();
