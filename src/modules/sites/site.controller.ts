@@ -53,7 +53,7 @@ export default class SiteController {
   @Get('all')
   @HttpCode(HttpStatus.OK)
   @Authentication(true)
-  @Authorization('users:read@auth')
+  @Authorization('sites:read@auth')
   @UseList()
   @Serializer(ListSiteResponse)
   public async getUserAll(): Promise<SuccessResponse> {

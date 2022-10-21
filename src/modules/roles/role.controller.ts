@@ -51,7 +51,7 @@ export default class RoleController {
   @Get('all')
   @HttpCode(HttpStatus.OK)
   @Authentication(true)
-  @Authorization('users:read@auth')
+  @Authorization('roles:read@auth')
   @UseList()
   @Serializer(ListRoleResponse)
   public async getUserAll(): Promise<SuccessResponse> {

@@ -30,7 +30,6 @@ export default class PermissionController {
   @Get('all')
   @HttpCode(HttpStatus.OK)
   @Authentication(true)
-  @Authorization('users:read@auth')
   @UseList()
   @Serializer(ListPermissionResponse)
   public async getUserAll(): Promise<SuccessResponse> {
