@@ -36,7 +36,6 @@ model User {
   siteId        String             @db.VarChar(36)
   roles         UsersRoles[]
   sessions      Session[]
-  works         AuditAuth[]
 
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
@@ -116,27 +115,4 @@ model Session {
   updatedAt DateTime @updatedAt
 
   @@map("sessions")
-}
-
-enum AuditAction {
-  CREATED
-  UPDATED
-  DELETED
-}
-
-model AuditAuth {
-  id          String      @id @default(uuid()) @db.VarChar(36)
-  auditable   String      @db.VarChar(30)
-  auditableId String      @db.VarChar(36)
-  previous    Json?
-  incoming    Json?
-  action      AuditAction
-  user        User        @relation(fields: [userId], references: [id])
-  userId      String      @db.VarChar(36)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-
-  @@index([auditable, auditableId])
-  @@index([userId])
-  @@map("audits")
 }

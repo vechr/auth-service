@@ -1,15 +1,9 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import {
-  AuditAction,
-  AuditAuth,
-  Prisma,
-  Session,
-  Site,
-  User,
-} from '@prisma/client';
+import { Prisma, Session, Site, User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import AuditAuthService from '../audits/audit.service';
+import AuditService from '../audits/audit.service';
 import siteException from '../sites/site.exception';
+import { AuditAction } from '../audits/types/audit-enum.type';
 import userException from './user.exception';
 import { GetUserParamsValidator } from './validators/get-user.validator';
 import { TListUserRequestQuery } from './requests/list-user.request';
@@ -28,12 +22,13 @@ import { parseMeta, parseQuery } from '@/shared/utils/query.util';
 import { generatePassword } from '@/shared/utils/password.util';
 import log from '@/shared/utils/log.util';
 import { UnknownException } from '@/shared/exceptions/common.exception';
+import { Auditable } from '@/shared/types/auditable.type';
 
 @Injectable()
 export default class UserService {
   constructor(
     private readonly db: PrismaService,
-    private readonly auditAuth: AuditAuthService,
+    private readonly auditService: AuditService,
   ) {}
 
   public async list(ctx: IContext): Promise<{
@@ -144,16 +139,15 @@ export default class UserService {
       });
 
       const auditUser: Partial<
-        User & { sessions: Session[]; works: AuditAuth[]; site: Site | null }
+        User & { sessions: Session[]; site: Site | null }
       > = user;
       delete auditUser.password;
       delete auditUser.sessions;
-      delete auditUser.works;
 
-      this.auditAuth.sendAudit(ctx, AuditAction.CREATED, {
+      this.auditService.sendAudit(ctx, AuditAction.CREATED, {
         id: user.id,
         incoming: auditUser,
-        auditable: 'user',
+        auditable: Auditable.USER,
       });
 
       return user;
@@ -206,12 +200,10 @@ export default class UserService {
     }
 
     const checkAuditUser: Partial<
-      User & { sessions: Session[]; works: AuditAuth[]; site: Site | null }
+      User & { sessions: Session[]; site: Site | null }
     > = checkUser;
     delete checkAuditUser.password;
     delete checkAuditUser.sessions;
-    delete checkAuditUser.works;
-
     try {
       const user = await this.db.user.update({
         where: { id: params.id },
@@ -236,17 +228,16 @@ export default class UserService {
       });
 
       const auditUser: Partial<
-        User & { sessions: Session[]; works: AuditAuth[]; site: Site | null }
+        User & { sessions: Session[]; site: Site | null }
       > = user;
       delete auditUser.password;
       delete auditUser.sessions;
-      delete auditUser.works;
 
-      this.auditAuth.sendAudit(ctx, AuditAction.UPDATED, {
+      this.auditService.sendAudit(ctx, AuditAction.UPDATED, {
         id: user.id,
         prev: checkAuditUser,
         incoming: auditUser,
-        auditable: 'user',
+        auditable: Auditable.USER,
       });
 
       return user;
@@ -277,16 +268,15 @@ export default class UserService {
     });
 
     const auditUser: Partial<
-      User & { sessions: Session[]; works: AuditAuth[]; site: Site | null }
+      User & { sessions: Session[]; site: Site | null }
     > = currentUser;
     delete auditUser.password;
     delete auditUser.sessions;
-    delete auditUser.works;
 
-    this.auditAuth.sendAudit(ctx, AuditAction.DELETED, {
+    this.auditService.sendAudit(ctx, AuditAction.DELETED, {
       id: user.id,
       prev: auditUser,
-      auditable: 'user',
+      auditable: Auditable.USER,
     });
 
     return user;

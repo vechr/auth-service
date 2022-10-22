@@ -19,4 +19,9 @@ export default Object.freeze({
     .asString(),
   NATS_URL: env.get('NATS_URL').required().asString(),
   NATS_SERVICE: 'NATS_SERVICE',
+  AUDIT_EVENT: {
+    CREATED: 'audit.created',
+    UPDATED: 'audit.updated',
+    DELETED: 'audit.deleted',
+  },
 });

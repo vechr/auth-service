@@ -1,4 +1,4 @@
-import { AuditAuth, Session, Site } from '@prisma/client';
+import { Session, Site } from '@prisma/client';
 import { instanceToPlain } from 'class-transformer';
 import {
   TUserCustomInformation,
@@ -12,7 +12,6 @@ export const transformUserToCustomInformation = (
   const parsedUser = instanceToPlain(user) as TUserCustomInformation & {
     site?: Site;
     sessions?: Session[];
-    works?: AuditAuth[];
   };
 
   parsedUser.permissions = generateUniquePermission({
@@ -28,7 +27,6 @@ export const transformUserToCustomInformation = (
   delete parsedUser.updatedAt;
 
   delete parsedUser.sessions;
-  delete parsedUser.works;
 
   return parsedUser;
 };

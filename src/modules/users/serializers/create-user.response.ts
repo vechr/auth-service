@@ -1,5 +1,4 @@
 import {
-  AuditAuth,
   Role,
   RolesPermissions,
   Session,
@@ -81,9 +80,6 @@ export default class UserResponse implements User {
 
   @Exclude()
   sessions: Session;
-
-  @Exclude()
-  works: AuditAuth;
 
   @Exclude()
   siteId: string;

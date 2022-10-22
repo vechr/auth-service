@@ -1,7 +1,8 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { AuditAction, Role } from '@prisma/client';
+import { Role } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import AuditAuthService from '../audits/audit.service';
+import { AuditAction } from '../audits/types/audit-enum.type';
+import AuditService from '../audits/audit.service';
 import { TListRoleRequestQuery } from './requests/list-role.request';
 import roleException from './role.exception';
 import { IGetRoleRequestParams } from './requests/get-role.request';
@@ -15,12 +16,13 @@ import { IContext } from '@/shared/interceptors/context.interceptor';
 import { parseMeta, parseQuery } from '@/shared/utils/query.util';
 import log from '@/shared/utils/log.util';
 import { UnknownException } from '@/shared/exceptions/common.exception';
+import { Auditable } from '@/shared/types/auditable.type';
 
 @Injectable()
 export default class RoleService {
   constructor(
     private readonly db: PrismaService,
-    private readonly auditAuth: AuditAuthService,
+    private readonly auditService: AuditService,
   ) {}
 
   public async list(ctx: IContext): Promise<{
@@ -108,10 +110,10 @@ export default class RoleService {
         include: this.includes(),
       });
 
-      this.auditAuth.sendAudit(ctx, AuditAction.CREATED, {
+      this.auditService.sendAudit(ctx, AuditAction.CREATED, {
         id: role.id,
         incoming: role,
-        auditable: 'role',
+        auditable: Auditable.ROLE,
       });
 
       return role;
@@ -154,11 +156,11 @@ export default class RoleService {
         include: this.includes(),
       });
 
-      this.auditAuth.sendAudit(ctx, AuditAction.UPDATED, {
+      this.auditService.sendAudit(ctx, AuditAction.UPDATED, {
         id: role.id,
         prev: currentRole,
         incoming: role,
-        auditable: 'role',
+        auditable: Auditable.ROLE,
       });
 
       return role;
@@ -189,10 +191,10 @@ export default class RoleService {
       include: this.includes(),
     });
 
-    this.auditAuth.sendAudit(ctx, AuditAction.DELETED, {
+    this.auditService.sendAudit(ctx, AuditAction.DELETED, {
       id: role.id,
       prev: currentRole,
-      auditable: 'role',
+      auditable: Auditable.ROLE,
     });
 
     return role;

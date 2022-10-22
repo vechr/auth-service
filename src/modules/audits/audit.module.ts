@@ -1,8 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import AuditAuthNatsController from './audit.nats';
-import AuditAuthService from './audit.service';
-import AuditAuthController from './audit.controller';
+import AuditService from './audit.service';
 import appConstant from '@/constants/app.constant';
 
 @Global()
@@ -18,8 +16,7 @@ import appConstant from '@/constants/app.constant';
       },
     ]),
   ],
-  controllers: [AuditAuthNatsController, AuditAuthController],
-  providers: [AuditAuthService],
-  exports: [AuditAuthService],
+  providers: [AuditService],
+  exports: [AuditService],
 })
-export default class AuditAuthModule {}
+export default class AuditModule {}

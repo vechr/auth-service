@@ -1,7 +1,8 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { AuditAction, Site } from '@prisma/client';
+import { Site } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import AuditAuthService from '../audits/audit.service';
+import AuditService from '../audits/audit.service';
+import { AuditAction } from '../audits/types/audit-enum.type';
 import { TListSiteRequestQuery } from './requests/list-site.request';
 import { IGetSiteRequestParams } from './requests/get-site.request';
 import siteException from './site.exception';
@@ -15,12 +16,13 @@ import { IContext } from '@/shared/interceptors/context.interceptor';
 import { parseMeta, parseQuery } from '@/shared/utils/query.util';
 import log from '@/shared/utils/log.util';
 import { UnknownException } from '@/shared/exceptions/common.exception';
+import { Auditable } from '@/shared/types/auditable.type';
 
 @Injectable()
 export default class SiteService {
   constructor(
     private readonly db: PrismaService,
-    private readonly auditAuth: AuditAuthService,
+    private readonly auditService: AuditService,
   ) {}
 
   public async list(ctx: IContext): Promise<{
@@ -98,10 +100,10 @@ export default class SiteService {
         data: body,
       });
 
-      this.auditAuth.sendAudit(ctx, AuditAction.CREATED, {
+      this.auditService.sendAudit(ctx, AuditAction.CREATED, {
         id: site.id,
         incoming: site,
-        auditable: 'site',
+        auditable: Auditable.SITE,
       });
 
       return site;
@@ -134,11 +136,11 @@ export default class SiteService {
         update: { ...currentSite, ...body },
       });
 
-      this.auditAuth.sendAudit(ctx, AuditAction.UPDATED, {
+      this.auditService.sendAudit(ctx, AuditAction.UPDATED, {
         id: site.id,
         prev: currentSite,
         incoming: site,
-        auditable: 'site',
+        auditable: Auditable.SITE,
       });
 
       return site;
@@ -168,10 +170,10 @@ export default class SiteService {
       where: { id: params.id },
     });
 
-    this.auditAuth.sendAudit(ctx, AuditAction.DELETED, {
+    this.auditService.sendAudit(ctx, AuditAction.DELETED, {
       id: site.id,
       prev: currentSite,
-      auditable: 'site',
+      auditable: Auditable.SITE,
     });
 
     return site;
