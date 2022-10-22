@@ -3,11 +3,15 @@
 </p>
 
 # Edit your `.env` file
-There's PORT for this app, Your NATS URL, and Database things
 ```
-APP_PORT=3000
-NATS_URL=nats://localhost:4222
-DB_URL="postgresql://Vechr:123@localhost:5432/auth-db?schema=public"
+DB_URL=postgresql://Vechr:123@postgres-db:5432/auth-db?schema=public&connect_timeout=300
+INITIAL_SITE='{"code":"ST1","name":"Site Default","location":"Server Default"}'
+INITIAL_SUPERUSER='{"fullName":"root","username": "root","emailAddress":"root@vechr.id","phoneNumber":"+62","password":"password123"}'
+JWT_SECRET=secretvechr
+ECRYPTED_SECRET=usersecret
+JWT_EXPIRES_IN=3d
+JWT_REFRESH_EXPIRES_IN=30d
+NATS_URL=nats://nats-server:4222
 ```
 
 # Running Auth Service
