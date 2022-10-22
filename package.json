@@ -50,7 +50,7 @@
     "pino": "^8.6.1",
     "pino-http": "^8.2.1",
     "pino-pretty": "^9.1.1",
-    "randomstring": "^1.2.2",
+    "randomstring": "^1.2.3",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
