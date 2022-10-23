@@ -342,7 +342,6 @@ export default class UserService {
 
   private includes = () => ({
     sessions: true,
-    works: true,
     roles: {
       include: {
         role: {
