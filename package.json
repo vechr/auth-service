@@ -24,7 +24,7 @@
     "start:prod": "node .build/server"
   },
   "dependencies": {
-    "@nestjs/common": "^9.1.5",
+    "@nestjs/common": "^9.1.6",
     "@nestjs/core": "^9.1.5",
     "@nestjs/jwt": "^9.0.0",
     "@nestjs/microservices": "^9.1.5",
