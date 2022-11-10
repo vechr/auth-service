@@ -21,7 +21,7 @@
     "prepare": "husky install",
     "prisma:prod:deploy": "prisma migrate deploy --schema './database/schema.prisma'",
     "prestart:prod": "npm run prisma:prod:deploy",
-    "start:prod": "node .build/server"
+    "start:prod": "node .build/src/server"
   },
   "dependencies": {
     "@nestjs/common": "^9.2.0",
