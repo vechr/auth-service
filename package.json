@@ -24,7 +24,8 @@
     "db:seed": "ts-node ./database/seeds/seed.ts",
     "prisma:sync": "prisma generate --schema './database/schema.prisma'",
     "prepare": "husky install",
-    "prisma:prod:deploy": "prisma migrate deploy --schema './database/schema.prisma'",
+    "db:prod:seed": "node .build/database/seeds/seed-prod",
+    "prisma:prod:deploy": "prisma migrate deploy --schema './database/schema.prisma' && yarn db:prod:seed",
     "prestart:prod": "npm run prisma:prod:deploy",
     "start:prod": "node .build/src/server",
     "semantic-release": "semantic-release"
