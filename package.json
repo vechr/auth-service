@@ -31,7 +31,7 @@
     "semantic-release": "semantic-release"
   },
   "dependencies": {
-    "@nestjs/common": "^9.2.1",
+    "@nestjs/common": "^9.3.3",
     "@nestjs/core": "^9.2.1",
     "@nestjs/jwt": "^9.0.0",
     "@nestjs/microservices": "^9.2.1",
