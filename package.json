@@ -90,7 +90,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "glob": "^8.0.3",
+    "glob": "^9.1.2",
     "husky": "^8.0.2",
     "jest": "^27.2.5",
     "lint-staged": "^13.1.0",
