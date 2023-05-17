@@ -726,12 +726,12 @@
     webpack "5.74.0"
     webpack-node-externals "3.0.0"
 
-"@nestjs/common@^9.3.10":
-  version "9.3.10"
-  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-9.3.10.tgz#c137402cad41123eaf5c74c2404e92490f9bbd50"
-  integrity sha512-wj2bM9TXBlAvzgznkID0s7bN/niVn90sZIDtRFDnvaB1qagEpkWA0Bt39qilIuqdReluIaCjeEW106U0oyz+mQ==
+"@nestjs/common@^9.4.1":
+  version "9.4.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-9.4.1.tgz#3588f3ec3b46d59302096a75c00cc1cd7f5452ea"
+  integrity sha512-VA5XXLAvXG3vY4GqvvuevL7Ooi5RRsov+ydMlgc1rPswgxkSVWaPTqNibsP4C6y5XJtKfc4Ol+zoe2w/LeYJTQ==
   dependencies:
-    uid "2.0.1"
+    uid "2.0.2"
     iterare "1.2.1"
     tslib "2.5.0"
 
@@ -8328,13 +8328,6 @@ uglify-js@^3.1.4:
   version "3.17.4"
   resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.17.4.tgz#61678cf5fa3f5b7eb789bb345df29afb8257c22c"
   integrity sha512-T9q82TJI9e/C1TAxYvfb16xO120tMVFZrGA3f9/P4424DNu6ypK103y0GPFVa17yotwSyZW5iYXgjYHkGrJW/g==
-
-uid@2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/uid/-/uid-2.0.1.tgz#a3f57c962828ea65256cd622fc363028cdf4526b"
-  integrity sha512-PF+1AnZgycpAIEmNtjxGBVmKbZAQguaa4pBUq6KNaGEcpzZ2klCNZLM34tsjp76maN00TttiiUf6zkIBpJQm2A==
-  dependencies:
-    "@lukeed/csprng" "^1.0.0"
 
 uid@2.0.2:
   version "2.0.2"
