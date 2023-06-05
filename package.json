@@ -43,7 +43,7 @@
     "class-validator": "^0.14.0",
     "cookie-parser": "^1.4.6",
     "crypto-js": "^4.1.1",
-    "dayjs": "^1.11.7",
+    "dayjs": "^1.11.8",
     "dotenv": "^16.0.3",
     "env-var": "^7.3.0",
     "hasha": "^5.2.2",
