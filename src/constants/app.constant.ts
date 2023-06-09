@@ -17,11 +17,14 @@ export default Object.freeze({
     .get('JWT_REFRESH_EXPIRES_IN')
     .default('30d')
     .asString(),
-  NATS_URL: env.get('NATS_URL').required().asString(),
   NATS_SERVICE: 'NATS_SERVICE',
   AUDIT_EVENT: {
     CREATED: 'audit.created',
     UPDATED: 'audit.updated',
     DELETED: 'audit.deleted',
   },
+  NATS_CA: env.get('NATS_CA').required().asString(),
+  NATS_KEY: env.get('NATS_KEY').required().asString(),
+  NATS_CERT: env.get('NATS_CERT').required().asString(),
+  NATS_URL: env.get('NATS_URL').required().asString(),
 });

@@ -12,6 +12,12 @@ import appConstant from '@/constants/app.constant';
         transport: Transport.NATS,
         options: {
           servers: [appConstant.NATS_URL],
+          maxReconnectAttempts: 10,
+          tls: {
+            caFile: appConstant.NATS_CA,
+            keyFile: appConstant.NATS_KEY,
+            certFile: appConstant.NATS_CERT,
+          },
         },
       },
     ]),
