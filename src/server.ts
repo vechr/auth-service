@@ -5,11 +5,11 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import log from '@shared/utils/log.util';
 import HttpExceptionFilter from '@shared/filters/http.filter';
 import UnknownExceptionsFilter from '@shared/filters/unknown.filter';
-
 import { VersioningType } from '@nestjs/common';
 import express from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import otelSDK from './tracing';
 import HttpModule from './app.module';
 import appConstant from './constants/app.constant';
 import ContextInterceptor from './shared/interceptors/context.interceptor';
@@ -109,5 +109,7 @@ const appServer = new Promise(async (resolve, reject) => {
 });
 
 (async function () {
+  if (appConstant.OTLP_HTTP_URL && appConstant.OTLP_HTTP_URL != '')
+    otelSDK.start();
   await Promise.all([appServer]);
 })();

@@ -27,4 +27,9 @@ export default Object.freeze({
   NATS_KEY: env.get('NATS_KEY').required().asString(),
   NATS_CERT: env.get('NATS_CERT').required().asString(),
   NATS_URL: env.get('NATS_URL').required().asString(),
+  APP_NAME: env.get('APP_NAME').default('auth-service').asString(),
+  LOKI_HOST: env.get('LOKI_HOST').asString(),
+  LOKI_USERNAME: env.get('LOKI_USERNAME').default('').asString(),
+  LOKI_PASSWORD: env.get('LOKI_PASSWORD').default('').asString(),
+  OTLP_HTTP_URL: env.get('OTLP_HTTP_URL').asString(),
 });
