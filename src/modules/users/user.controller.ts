@@ -10,6 +10,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { OtelInstanceCounter, OtelMethodCounter } from 'nestjs-otel';
 import UserService from './user.service';
 import GetUserResponse from './serializers/get-user.response';
 import GetUserValidator, {
@@ -46,6 +47,7 @@ import { TUserCustomInformation } from '@/shared/types/user.type';
 @ApiTags('User')
 @ApiBearerAuth('access-token')
 @Controller('auth/users')
+@OtelInstanceCounter()
 export default class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -55,6 +57,7 @@ export default class UserController {
   @Authorization('users:read@auth')
   @UseList()
   @Serializer(ListUserResponse)
+  @OtelMethodCounter()
   public async getUserAll(): Promise<SuccessResponse> {
     const result = await this.userService.getUserAll();
 
@@ -69,6 +72,7 @@ export default class UserController {
   @Validator(ListUserValidator)
   @Serializer(ListUserResponse)
   @ApiFilterQuery('filters', ListUserQueryValidator)
+  @OtelMethodCounter()
   public async list(@Context() ctx: IContext): Promise<SuccessResponse> {
     const { result, meta } = await this.userService.list(ctx);
 
@@ -81,6 +85,7 @@ export default class UserController {
   @Authorization('users:read@auth')
   @Validator(GetUserValidator)
   @Serializer(GetUserResponse)
+  @OtelMethodCounter()
   public async get(
     @Param() params: GetUserParamsValidator,
   ): Promise<SuccessResponse> {
@@ -95,6 +100,7 @@ export default class UserController {
   @Authorization('user:update@auth')
   @Validator(UpdateUserValidator)
   @Serializer(UpdateUserResponse)
+  @OtelMethodCounter()
   public async update(
     @Context() ctx: IContext,
     @Param() params: UpdateUserParamsValidator,
@@ -111,6 +117,7 @@ export default class UserController {
   @Authorization('users:create@auth')
   @Validator(CreateUserValidator)
   @Serializer(GetUserResponse)
+  @OtelMethodCounter()
   public async create(
     @Context() ctx: IContext,
     @User() user: TUserCustomInformation,
@@ -127,6 +134,7 @@ export default class UserController {
   @Authorization('users:delete@auth')
   @Validator(DeleteUserValidator)
   @Serializer(DeleteUserResponse)
+  @OtelMethodCounter()
   public async delete(
     @Context() ctx: IContext,
     @Param() params: DeleteUserParamsValidator,

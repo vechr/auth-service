@@ -7,6 +7,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { OtelInstanceCounter, OtelMethodCounter } from 'nestjs-otel';
 import SessionService from './session.service';
 import CreateSessionValidator, {
   CreateSessionBodyValidator,
@@ -24,6 +25,7 @@ import { TUserCustomInformation } from '@/shared/types/user.type';
 import CookieAuthentication from '@/shared/decorators/cookie-auth.decorator';
 @ApiTags('Session')
 @Controller('auth/sessions')
+@OtelInstanceCounter()
 export default class SessionController {
   constructor(private readonly sessionService: SessionService) {}
 
@@ -31,6 +33,7 @@ export default class SessionController {
   @Get('me')
   @HttpCode(HttpStatus.OK)
   @Authentication(true)
+  @OtelMethodCounter()
   public async getMe(
     @User() user: TUserCustomInformation,
   ): Promise<SuccessResponse> {
@@ -42,6 +45,7 @@ export default class SessionController {
   @HttpCode(HttpStatus.OK)
   @Authentication(true)
   @CookieAuthentication('logout')
+  @OtelMethodCounter()
   public async logout(
     @User() user: TUserCustomInformation,
   ): Promise<SuccessResponse> {
@@ -53,6 +57,7 @@ export default class SessionController {
   @Get()
   @HttpCode(HttpStatus.OK)
   @Authentication(true)
+  @OtelMethodCounter()
   public async pingAuth(): Promise<SuccessResponse> {
     return new SuccessResponse('token status ok!', true);
   }
@@ -62,6 +67,7 @@ export default class SessionController {
   @Validator(CreateSessionValidator)
   @Serializer(CreateSessionResponse)
   @CookieAuthentication('login')
+  @OtelMethodCounter()
   public async create(
     @Context() ctx: IContext,
     @Body() body: CreateSessionBodyValidator,
@@ -80,6 +86,7 @@ export default class SessionController {
   @Authentication(true)
   @Serializer(RefreshSessionResponse)
   @CookieAuthentication('login')
+  @OtelMethodCounter()
   public async refresh(@Context() ctx: IContext): Promise<SuccessResponse> {
     const result = await this.sessionService.refresh(ctx);
 

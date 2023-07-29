@@ -1,5 +1,6 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { OtelInstanceCounter, OtelMethodCounter } from 'nestjs-otel';
 import { TAuditCreatedPayload } from './types/audit-created.type';
 import { TAuditUpdatedPayload } from './types/audit-updated.type';
 import { TAuditDeletedPayload } from './types/audit-deleted.type';
@@ -9,9 +10,12 @@ import { publish } from '@/shared/utils/nats.util';
 import { TUserCustomInformation } from '@/shared/types/user.type';
 import appConstant from '@/constants/app.constant';
 
+@Injectable()
+@OtelInstanceCounter()
 export default class AuditService {
   constructor(@Inject('NATS_SERVICE') private readonly client: ClientProxy) {}
 
+  @OtelMethodCounter()
   public async sendAudit(
     ctx: IContext,
     action: AuditAction,

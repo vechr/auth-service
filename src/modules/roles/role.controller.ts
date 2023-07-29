@@ -10,6 +10,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { OtelInstanceCounter, OtelMethodCounter } from 'nestjs-otel';
 import RoleService from './role.service';
 import ListRoleResponse from './serializers/list-role.response';
 import ListRoleValidator, {
@@ -45,6 +46,7 @@ import { ApiFilterQuery } from '@/shared/decorators/api-filter-query.decorator';
 @ApiTags('Role')
 @ApiBearerAuth('access-token')
 @Controller('auth/roles')
+@OtelInstanceCounter()
 export default class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
@@ -54,6 +56,7 @@ export default class RoleController {
   @Authorization('roles:read@auth')
   @UseList()
   @Serializer(ListRoleResponse)
+  @OtelMethodCounter()
   public async getUserAll(): Promise<SuccessResponse> {
     const result = await this.roleService.getRoleAll();
 
@@ -68,6 +71,7 @@ export default class RoleController {
   @Validator(ListRoleValidator)
   @Serializer(ListRoleResponse)
   @ApiFilterQuery('filters', ListRoleQueryValidator)
+  @OtelMethodCounter()
   public async list(@Context() ctx: IContext): Promise<SuccessResponse> {
     const { result, meta } = await this.roleService.list(ctx);
 
@@ -80,6 +84,7 @@ export default class RoleController {
   @Authorization('roles:read@auth')
   @Validator(GetRoleValidator)
   @Serializer(GetRoleResponse)
+  @OtelMethodCounter()
   public async get(
     @Param() params: GetRoleParamsValidator,
   ): Promise<SuccessResponse> {
@@ -94,6 +99,7 @@ export default class RoleController {
   @Authorization('roles:create@auth')
   @Validator(CreateRoleValidator)
   @Serializer(CreateRoleResponse)
+  @OtelMethodCounter()
   public async create(
     @Context() ctx: IContext,
     @Body() body: CreateRoleBodyValidator,
@@ -109,6 +115,7 @@ export default class RoleController {
   @Authorization('roles@update@auth')
   @Validator(UpdateRoleValidator)
   @Serializer(UpdateRoleResponse)
+  @OtelMethodCounter()
   public async update(
     @Context() ctx: IContext,
     @Param() params: UpdateRoleParamsValidator,
@@ -125,6 +132,7 @@ export default class RoleController {
   @Authorization('roles:delete@auth')
   @Validator(DeleteRoleValidator)
   @Serializer(DeleteRoleResponse)
+  @OtelMethodCounter()
   public async delete(
     @Context() ctx: IContext,
     @Param() params: DeleteRoleParamsValidator,
