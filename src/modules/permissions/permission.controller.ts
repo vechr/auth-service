@@ -10,6 +10,7 @@ import Validator from '@shared/decorators/validator.decorator';
 import UseList from '@shared/decorators/uselist.decorator';
 
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { OtelInstanceCounter, OtelMethodCounter } from 'nestjs-otel';
 import PermissionService from './permission.service';
 import ListPermissionValidator, {
   ListPermissionQueryValidator,
@@ -24,6 +25,7 @@ import { ApiFilterQuery } from '@/shared/decorators/api-filter-query.decorator';
 @ApiTags('Permission')
 @ApiBearerAuth('access-token')
 @Controller('auth/permissions')
+@OtelInstanceCounter()
 export default class PermissionController {
   constructor(private readonly permissionService: PermissionService) {}
 
@@ -32,6 +34,7 @@ export default class PermissionController {
   @Authentication(true)
   @UseList()
   @Serializer(ListPermissionResponse)
+  @OtelMethodCounter()
   public async getUserAll(): Promise<SuccessResponse> {
     const result = await this.permissionService.getPermissionAll();
 
@@ -46,6 +49,7 @@ export default class PermissionController {
   @Validator(ListPermissionValidator)
   @Serializer(ListPermissionResponse)
   @ApiFilterQuery('filters', ListPermissionQueryValidator)
+  @OtelMethodCounter()
   public async list(@Context() ctx: IContext): Promise<SuccessResponse> {
     const { result, meta } = await this.permissionService.list(ctx);
 
@@ -58,6 +62,7 @@ export default class PermissionController {
   @Authorization('permissions:read@auth')
   @Validator(GetPermissionValidator)
   @Serializer(GetPermissionResponse)
+  @OtelMethodCounter()
   public async get(
     @Context() ctx: IContext,
     @Param() params: GetPermissionParamsValidator,

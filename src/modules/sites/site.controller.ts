@@ -20,6 +20,7 @@ import Validator from '@shared/decorators/validator.decorator';
 import Serializer from '@shared/decorators/serializer.decorator';
 
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { OtelInstanceCounter, OtelMethodCounter } from 'nestjs-otel';
 import SiteService from './site.service';
 import ListSiteValidator, {
   ListSiteQueryValidator,
@@ -47,6 +48,7 @@ import { ApiFilterQuery } from '@/shared/decorators/api-filter-query.decorator';
 @ApiTags('Site')
 @ApiBearerAuth('access-token')
 @Controller('auth/sites')
+@OtelInstanceCounter()
 export default class SiteController {
   constructor(private readonly siteService: SiteService) {}
 
@@ -56,6 +58,7 @@ export default class SiteController {
   @Authorization('sites:read@auth')
   @UseList()
   @Serializer(ListSiteResponse)
+  @OtelMethodCounter()
   public async getUserAll(): Promise<SuccessResponse> {
     const result = await this.siteService.getSiteAll();
 
@@ -70,6 +73,7 @@ export default class SiteController {
   @Validator(ListSiteValidator)
   @Serializer(ListSiteResponse)
   @ApiFilterQuery('filters', ListSiteQueryValidator)
+  @OtelMethodCounter()
   public async list(@Context() ctx: IContext): Promise<SuccessResponse> {
     const { result, meta } = await this.siteService.list(ctx);
 
@@ -82,6 +86,7 @@ export default class SiteController {
   @Authorization('sites:read@auth')
   @Validator(GetSiteValidator)
   @Serializer(GetSiteResponse)
+  @OtelMethodCounter()
   public async get(
     @Param() params: GetSiteParamsValidator,
   ): Promise<SuccessResponse> {
@@ -96,6 +101,7 @@ export default class SiteController {
   @Authorization('sites:create@auth')
   @Validator(CreateSiteValidator)
   @Serializer(CreateSiteResponse)
+  @OtelMethodCounter()
   public async create(
     @Context() ctx: IContext,
     @Body() body: CreateSiteBodyValidator,
@@ -111,6 +117,7 @@ export default class SiteController {
   @Authorization('sites:update@auth')
   @Validator(UpdateSiteValidator)
   @Serializer(UpdateSiteResponse)
+  @OtelMethodCounter()
   public async update(
     @Context() ctx: IContext,
     @Param() params: UpdateSiteParamsValidator,
@@ -127,6 +134,7 @@ export default class SiteController {
   @Authorization('sites:delete@auth')
   @Validator(DeleteSiteValidator)
   @Serializer(DeleteSiteResponse)
+  @OtelMethodCounter()
   public async delete(
     @Context() ctx: IContext,
     @Param() params: DeleteSiteParamsValidator,
