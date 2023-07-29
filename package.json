@@ -86,7 +86,7 @@
     "@types/ms": "^0.7.31",
     "@types/node": "^18.16.1",
     "@types/passport-jwt": "^3.0.8",
-    "@types/passport-local": "^1.0.34",
+    "@types/passport-local": "^1.0.35",
     "@types/pino": "^7.0.5",
     "@types/pino-pretty": "^5.0.0",
     "@types/randomstring": "^1.1.8",
