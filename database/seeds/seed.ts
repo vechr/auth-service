@@ -23,7 +23,12 @@ const prisma = new PrismaClient();
       const fileNameWithExt = seedFile.split('/').slice().pop();
       const fileName = fileNameWithExt?.replace('.ts', '');
 
-      if (fileNameWithExt && fileName && fileNameWithExt !== 'seed.ts') {
+      if (
+        fileNameWithExt &&
+        fileName &&
+        fileNameWithExt !== 'seed.ts' &&
+        fileNameWithExt !== 'seed-prod.ts'
+      ) {
         const path = seedFile.replace(__dirname, '.').replace('.ts', '');
 
         try {
