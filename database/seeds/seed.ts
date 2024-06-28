@@ -17,7 +17,7 @@ const consoleTransport = new transports.Console({
 });
 
 const winstonModuleOptions = {
-  levels: winston.config.syslog.levels,
+  levels: winston.config.npm.levels,
   transports: [consoleTransport],
 };
 

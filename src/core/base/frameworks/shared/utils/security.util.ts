@@ -1,5 +1,5 @@
-import hasha from 'hasha';
 import randomstring from 'randomstring';
+import { SHA512, MD5 } from 'crypto-js';
 
 export const rand = (len?: number): Promise<string> =>
   new Promise((res, rej) => {
@@ -22,7 +22,7 @@ export const generateSalt = (): Promise<string> =>
 export const md5 = (plain: any): Promise<string> =>
   new Promise((res, rej) => {
     try {
-      res(hasha(plain, { algorithm: 'md5' }));
+      res(MD5(plain).toString());
     } catch (error) {
       rej(error);
     }
@@ -31,7 +31,7 @@ export const md5 = (plain: any): Promise<string> =>
 export const sha512 = (plain: any): Promise<string> =>
   new Promise((res, rej) => {
     try {
-      res(hasha(plain, { algorithm: 'sha512' }));
+      res(SHA512(plain).toString());
     } catch (error) {
       rej(error);
     }
