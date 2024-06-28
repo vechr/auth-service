@@ -1,22 +1,19 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { Site } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import AuditService from '../audits/audit.service';
 import { AuditAction } from '../audits/types/audit-enum.type';
 import { TListSiteRequestQuery } from './requests/list-site.request';
 import { IGetSiteRequestParams } from './requests/get-site.request';
 import siteException from './site.exception';
 import { ICreateSiteRequestBody } from './requests/create-site.request';
-import {
-  IUpdateSiteRequestBody,
-  IUpdateSiteRequestParams,
-} from './requests/update-site.request';
-import PrismaService from '@/prisma/prisma.service';
-import { IContext } from '@/shared/interceptors/context.interceptor';
-import { parseMeta, parseQuery } from '@/shared/utils/query.util';
-import log from '@/shared/utils/log.util';
-import { UnknownException } from '@/shared/exceptions/common.exception';
-import { Auditable } from '@/shared/types/auditable.type';
+import { IUpdateSiteRequestBody, IUpdateSiteRequestParams } from './requests/update-site.request';
+import PrismaService from '@/core/base/frameworks/data-services/prisma.service';
+import { IContext } from '@/core/base/frameworks/shared/interceptors/context.interceptor';
+import { parseMeta, parseQuery } from '@utils/query.util';
+import log from '@utils/log.util';
+import { UnknownException } from '@/core/base/frameworks/shared/exceptions/common.exception';
+import { Auditable } from '@/core/base/frameworks/shared/types/auditable.type';
 
 @Injectable()
 export default class SiteService {
@@ -31,8 +28,7 @@ export default class SiteService {
   }> {
     const query = ctx.params.query as TListSiteRequestQuery;
 
-    const { limit, offset, order, page } =
-      parseQuery<TListSiteRequestQuery>(query);
+    const { limit, offset, order, page } = parseQuery<TListSiteRequestQuery>(query);
 
     const selectOptions = {
       orderBy: order,
@@ -91,10 +87,7 @@ export default class SiteService {
     return site;
   }
 
-  public async create(
-    ctx: IContext,
-    body: ICreateSiteRequestBody,
-  ): Promise<Site> {
+  public async create(ctx: IContext, body: ICreateSiteRequestBody): Promise<Site> {
     try {
       const site = await this.db.site.create({
         data: body,
@@ -146,18 +139,14 @@ export default class SiteService {
       return site;
     } catch (error: any) {
       if (error.code === 'P2002') {
-        if (body.code)
-          throw new siteException.DuplicateSite({ code: body.code });
+        if (body.code) throw new siteException.DuplicateSite({ code: body.code });
       }
 
       throw error;
     }
   }
 
-  public async delete(
-    ctx: IContext,
-    params: IUpdateSiteRequestParams,
-  ): Promise<Site> {
+  public async delete(ctx: IContext, params: IUpdateSiteRequestParams): Promise<Site> {
     const currentSite = await this.db.site.findUnique({
       where: { id: params.id },
     });

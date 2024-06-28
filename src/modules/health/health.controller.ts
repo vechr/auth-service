@@ -1,18 +1,11 @@
-import {
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Version,
-  VERSION_NEUTRAL,
-} from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Version, VERSION_NEUTRAL } from '@nestjs/common';
 import {
   HealthCheckService,
   HealthCheck,
   PrismaHealthIndicator,
   HealthCheckResult,
 } from '@nestjs/terminus';
-import PrismaService from '@/prisma/prisma.service';
+import PrismaService from '@/core/base/frameworks/data-services/prisma.service';
 
 @Controller()
 export default class HealthController {

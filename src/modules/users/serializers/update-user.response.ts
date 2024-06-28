@@ -1,11 +1,4 @@
-import {
-  Role,
-  RolesPermissions,
-  Session,
-  Site,
-  User,
-  UsersRoles,
-} from '@prisma/client';
+import { Role, RolesPermissions, Session, Site, User, UsersRoles } from '@prisma/client';
 import { Exclude, Type } from 'class-transformer';
 
 export class UpdateRoleResponse implements Role {

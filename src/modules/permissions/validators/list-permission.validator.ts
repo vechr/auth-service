@@ -4,7 +4,7 @@ import { IsObject, IsOptional, ValidateNested } from 'class-validator';
 
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { TListPermissionRequestQuery } from '../requests/list-permission.request';
-import { BaseQueryValidator, OperatorQuery } from '@/shared/types/query.type';
+import { BaseQueryValidator, OperatorQuery } from '@shared/types/query.type';
 
 class ListPermissionQueryField implements Prisma.PermissionWhereInput {
   @Expose()

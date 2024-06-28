@@ -4,7 +4,7 @@ import { IsObject, IsOptional, ValidateNested } from 'class-validator';
 
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { TListSiteRequestQuery } from '../requests/list-site.request';
-import { BaseQueryValidator, OperatorQuery } from '@/shared/types/query.type';
+import { BaseQueryValidator, OperatorQuery } from '@shared/types/query.type';
 
 export class ListSiteQueryField implements Prisma.SiteWhereInput {
   @Expose()

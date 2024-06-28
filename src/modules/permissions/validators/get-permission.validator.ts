@@ -4,9 +4,7 @@ import { IsObject, IsUUID, ValidateNested } from 'class-validator';
 
 import { IGetPermissionRequestParams } from '../requests/get-permission.request';
 
-export class GetPermissionParamsValidator
-  implements IGetPermissionRequestParams
-{
+export class GetPermissionParamsValidator implements IGetPermissionRequestParams {
   @ApiProperty({
     example: 'd8beca16-5296-458a-bc8a-609d217fed08',
     description: 'Insert your permission in Here!',

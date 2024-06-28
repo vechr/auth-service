@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { Prisma, Session, Site, User } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import AuditService from '../audits/audit.service';
 import siteException from '../sites/site.exception';
 import { AuditAction } from '../audits/types/audit-enum.type';
@@ -8,21 +8,18 @@ import userException from './user.exception';
 import { GetUserParamsValidator } from './validators/get-user.validator';
 import { TListUserRequestQuery } from './requests/list-user.request';
 import { CreateUserBodyValidator } from './validators/create-user.validator';
-import {
-  IUpdateUserRequestBody,
-  IUpdateUserRequestParams,
-} from './requests/update-user.request';
-import PrismaService from '@/prisma/prisma.service';
+import { IUpdateUserRequestBody, IUpdateUserRequestParams } from './requests/update-user.request';
+import PrismaService from '@/core/base/frameworks/data-services/prisma.service';
 import {
   TUserCustomInformation,
   TUserFullInformation,
-} from '@/shared/types/user.type';
-import { IContext } from '@/shared/interceptors/context.interceptor';
-import { parseMeta, parseQuery } from '@/shared/utils/query.util';
-import { generatePassword } from '@/shared/utils/password.util';
-import log from '@/shared/utils/log.util';
-import { UnknownException } from '@/shared/exceptions/common.exception';
-import { Auditable } from '@/shared/types/auditable.type';
+} from '@/core/base/frameworks/shared/types/user.type';
+import { IContext } from '@/core/base/frameworks/shared/interceptors/context.interceptor';
+import { parseMeta, parseQuery } from '@utils/query.util';
+import { generatePassword } from '@utils/password.util';
+import log from '@utils/log.util';
+import { UnknownException } from '@/core/base/frameworks/shared/exceptions/common.exception';
+import { Auditable } from '@/core/base/frameworks/shared/types/auditable.type';
 
 @Injectable()
 export default class UserService {
@@ -37,8 +34,7 @@ export default class UserService {
   }> {
     const query = ctx.params.query as TListUserRequestQuery;
 
-    const { limit, offset, order, page } =
-      parseQuery<TListUserRequestQuery>(query);
+    const { limit, offset, order, page } = parseQuery<TListUserRequestQuery>(query);
 
     const selectOptions = {
       orderBy: order,
@@ -138,9 +134,7 @@ export default class UserService {
         include: this.includes(),
       });
 
-      const auditUser: Partial<
-        User & { sessions: Session[]; site: Site | null }
-      > = user;
+      const auditUser: Partial<User & { sessions: Session[]; site: Site | null }> = user;
       delete auditUser.password;
       delete auditUser.sessions;
 
@@ -199,9 +193,7 @@ export default class UserService {
       throw new siteException.SiteNotFound({ id: params.id });
     }
 
-    const checkAuditUser: Partial<
-      User & { sessions: Session[]; site: Site | null }
-    > = checkUser;
+    const checkAuditUser: Partial<User & { sessions: Session[]; site: Site | null }> = checkUser;
     delete checkAuditUser.password;
     delete checkAuditUser.sessions;
     try {
@@ -227,9 +219,7 @@ export default class UserService {
         include: this.includes(),
       });
 
-      const auditUser: Partial<
-        User & { sessions: Session[]; site: Site | null }
-      > = user;
+      const auditUser: Partial<User & { sessions: Session[]; site: Site | null }> = user;
       delete auditUser.password;
       delete auditUser.sessions;
 
@@ -250,10 +240,7 @@ export default class UserService {
     }
   }
 
-  public async delete(
-    ctx: IContext,
-    params: IUpdateUserRequestParams,
-  ): Promise<User> {
+  public async delete(ctx: IContext, params: IUpdateUserRequestParams): Promise<User> {
     const currentUser = await this.db.user.findUnique({
       where: { id: params.id },
     });
@@ -267,9 +254,7 @@ export default class UserService {
       include: this.includes(),
     });
 
-    const auditUser: Partial<
-      User & { sessions: Session[]; site: Site | null }
-    > = currentUser;
+    const auditUser: Partial<User & { sessions: Session[]; site: Site | null }> = currentUser;
     delete auditUser.password;
     delete auditUser.sessions;
 
@@ -282,10 +267,7 @@ export default class UserService {
     return user;
   }
 
-  public async findById(
-    id: string,
-    include?: Prisma.UserInclude,
-  ): Promise<User | null> {
+  public async findById(id: string, include?: Prisma.UserInclude): Promise<User | null> {
     const user = await this.db.user.findUnique({
       where: {
         id,
@@ -316,9 +298,7 @@ export default class UserService {
     return user;
   }
 
-  public async findCompleteByUsername(
-    username: string,
-  ): Promise<TUserFullInformation> {
+  public async findCompleteByUsername(username: string): Promise<TUserFullInformation> {
     const user = await this.findCompleteBy('username', username);
 
     return user;
@@ -326,17 +306,11 @@ export default class UserService {
 
   private async findCompleteBy(type: 'username' | 'id', unique: string) {
     if (type === 'username') {
-      const user = (await this.findByUsername(
-        unique,
-        this.includes(),
-      )) as TUserFullInformation;
+      const user = (await this.findByUsername(unique, this.includes())) as TUserFullInformation;
       return user;
     }
 
-    const user = (await this.findById(
-      unique,
-      this.includes(),
-    )) as TUserFullInformation;
+    const user = (await this.findById(unique, this.includes())) as TUserFullInformation;
     return user;
   }
 

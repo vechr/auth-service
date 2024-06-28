@@ -4,7 +4,7 @@ import { IsObject, IsOptional, ValidateNested } from 'class-validator';
 
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { TListUserRequestQuery } from '../requests/list-user.request';
-import { BaseQueryValidator, OperatorQuery } from '@/shared/types/query.type';
+import { BaseQueryValidator, OperatorQuery } from '@shared/types/query.type';
 
 class ListUserQueryField implements Prisma.UserWhereInput {
   @Expose()

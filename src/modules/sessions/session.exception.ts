@@ -1,7 +1,4 @@
-import {
-  BadRequestException,
-  NotFoundException,
-} from '@shared/exceptions/common.exception';
+import { BadRequestException, NotFoundException } from '@shared/exceptions/common.exception';
 
 export enum ESessionErrorCode {
   USER_NOT_FOUND = 'R404',
@@ -14,8 +11,7 @@ export enum ESessionErrorCode {
 class RefreshTokenNotFound extends NotFoundException {
   constructor() {
     super({
-      message:
-        'please provide refresh token, or you request login first before proceed!',
+      message: 'please provide refresh token, or you request login first before proceed!',
       code: ESessionErrorCode.REFRESH_TOKEN_NOT_FOUND,
     });
   }

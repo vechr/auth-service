@@ -16,34 +16,25 @@ import UseList from '@shared/decorators/uselist.decorator';
 import Context from '@shared/decorators/context.decorator';
 import { IContext } from '@shared/interceptors/context.interceptor';
 import SuccessResponse from '@shared/responses/success.response';
-import Validator from '@shared/decorators/validator.decorator';
 import Serializer from '@shared/decorators/serializer.decorator';
 
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { OtelInstanceCounter, OtelMethodCounter } from 'nestjs-otel';
 import SiteService from './site.service';
-import ListSiteValidator, {
-  ListSiteQueryValidator,
-} from './validators/list-site.validator';
-import GetSiteValidator, {
-  GetSiteParamsValidator,
-} from './validators/get-site.validator';
+import { ListSiteQueryValidator } from './validators/list-site.validator';
+import { GetSiteParamsValidator } from './validators/get-site.validator';
 import GetSiteResponse from './serializers/get-site.response';
 import ListSiteResponse from './serializers/list-site.response';
-import CreateSiteValidator, {
-  CreateSiteBodyValidator,
-} from './validators/create-site.validator';
+import { CreateSiteBodyValidator } from './validators/create-site.validator';
 import CreateSiteResponse from './serializers/create-site.response';
-import UpdateSiteValidator, {
+import {
   UpdateSiteBodyValidator,
   UpdateSiteParamsValidator,
 } from './validators/update-site.validator';
 import UpdateSiteResponse from './serializers/update-site.response';
-import DeleteSiteValidator, {
-  DeleteSiteParamsValidator,
-} from './validators/delete-site.validator';
+import { DeleteSiteParamsValidator } from './validators/delete-site.validator';
 import DeleteSiteResponse from './serializers/delete-site.response';
-import { ApiFilterQuery } from '@/shared/decorators/api-filter-query.decorator';
+import { ApiFilterQuery } from '@/core/base/frameworks/shared/decorators/api-filter-query.decorator';
 
 @ApiTags('Site')
 @ApiBearerAuth('access-token')
@@ -70,7 +61,6 @@ export default class SiteController {
   @Authentication(true)
   @Authorization('sites:read@auth')
   @UseList()
-  @Validator(ListSiteValidator)
   @Serializer(ListSiteResponse)
   @ApiFilterQuery('filters', ListSiteQueryValidator)
   @OtelMethodCounter()
@@ -84,12 +74,9 @@ export default class SiteController {
   @HttpCode(HttpStatus.OK)
   @Authentication(true)
   @Authorization('sites:read@auth')
-  @Validator(GetSiteValidator)
   @Serializer(GetSiteResponse)
   @OtelMethodCounter()
-  public async get(
-    @Param() params: GetSiteParamsValidator,
-  ): Promise<SuccessResponse> {
+  public async get(@Param() params: GetSiteParamsValidator): Promise<SuccessResponse> {
     const result = await this.siteService.get(params);
 
     return new SuccessResponse('site fetched successfully', result);
@@ -99,7 +86,6 @@ export default class SiteController {
   @HttpCode(HttpStatus.CREATED)
   @Authentication(true)
   @Authorization('sites:create@auth')
-  @Validator(CreateSiteValidator)
   @Serializer(CreateSiteResponse)
   @OtelMethodCounter()
   public async create(
@@ -115,7 +101,6 @@ export default class SiteController {
   @HttpCode(HttpStatus.CREATED)
   @Authentication(true)
   @Authorization('sites:update@auth')
-  @Validator(UpdateSiteValidator)
   @Serializer(UpdateSiteResponse)
   @OtelMethodCounter()
   public async update(
@@ -132,7 +117,6 @@ export default class SiteController {
   @HttpCode(HttpStatus.CREATED)
   @Authentication(true)
   @Authorization('sites:delete@auth')
-  @Validator(DeleteSiteValidator)
   @Serializer(DeleteSiteResponse)
   @OtelMethodCounter()
   public async delete(

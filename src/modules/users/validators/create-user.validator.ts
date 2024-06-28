@@ -67,8 +67,7 @@ export class CreateUserBodyValidator implements ICreateUserRequestBody {
 
   @ApiProperty({
     example: 'john123',
-    description:
-      'Insert your confirm password in Here!, make sure same as a password',
+    description: 'Insert your confirm password in Here!, make sure same as a password',
   })
   @IsString()
   @MinLength(3)
@@ -77,10 +76,7 @@ export class CreateUserBodyValidator implements ICreateUserRequestBody {
   confirmPassword: string;
 
   @ApiProperty({
-    example: [
-      'e9f8ed8f-3a2e-468b-9397-5da8db36ff76',
-      '1cf37cb6-48a3-11ed-b878-0242ac120002',
-    ],
+    example: ['e9f8ed8f-3a2e-468b-9397-5da8db36ff76', '1cf37cb6-48a3-11ed-b878-0242ac120002'],
     description: 'You can attach role into this user!',
   })
   @IsArray()

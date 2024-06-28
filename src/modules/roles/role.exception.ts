@@ -1,4 +1,4 @@
-import { NotFoundException } from '@/shared/exceptions/common.exception';
+import { NotFoundException } from '@/core/base/frameworks/shared/exceptions/common.exception';
 
 export enum ERoleErrorCode {
   ROLE_NOT_FOUND = '404',

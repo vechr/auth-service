@@ -1,11 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsObject,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 import { ICreateSiteRequestBody } from '../requests/create-site.request';
 

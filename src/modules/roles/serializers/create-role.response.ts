@@ -1,9 +1,4 @@
-import {
-  Permission,
-  PermissionType,
-  Role,
-  RolesPermissions,
-} from '@prisma/client';
+import { Permission, PermissionType, Role, RolesPermissions } from '@prisma/client';
 import { Exclude, Type } from 'class-transformer';
 
 export class CreatePermissionResponse implements Permission {

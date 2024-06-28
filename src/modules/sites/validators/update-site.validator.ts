@@ -1,17 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsObject,
-  IsOptional,
-  IsString,
-  IsUUID,
-  ValidateNested,
-} from 'class-validator';
+import { IsObject, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
 
-import {
-  IUpdateSiteRequestBody,
-  IUpdateSiteRequestParams,
-} from '../requests/update-site.request';
+import { IUpdateSiteRequestBody, IUpdateSiteRequestParams } from '../requests/update-site.request';
 
 export class UpdateSiteBodyValidator implements IUpdateSiteRequestBody {
   @ApiProperty({

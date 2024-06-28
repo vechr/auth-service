@@ -3,7 +3,7 @@ import { Prisma, Role } from '@prisma/client';
 import { Expose, Type } from 'class-transformer';
 import { IsObject, IsOptional, ValidateNested } from 'class-validator';
 import { TListRoleRequestQuery } from '../requests/list-role.request';
-import { BaseQueryValidator, OperatorQuery } from '@/shared/types/query.type';
+import { BaseQueryValidator, OperatorQuery } from '@shared/types/query.type';
 
 export class ListRoleQueryField implements Prisma.RoleWhereInput {
   @Expose()

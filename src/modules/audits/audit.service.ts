@@ -5,10 +5,10 @@ import { TAuditCreatedPayload } from './types/audit-created.type';
 import { TAuditUpdatedPayload } from './types/audit-updated.type';
 import { TAuditDeletedPayload } from './types/audit-deleted.type';
 import { AuditAction } from './types/audit-enum.type';
-import { IContext } from '@/shared/interceptors/context.interceptor';
-import { publish } from '@/shared/utils/nats.util';
-import { TUserCustomInformation } from '@/shared/types/user.type';
-import appConstant from '@/constants/app.constant';
+import { IContext } from '@/core/base/frameworks/shared/interceptors/context.interceptor';
+import { publish } from '@/core/base/frameworks/shared/utils/nats.util';
+import { TUserCustomInformation } from '@/core/base/frameworks/shared/types/user.type';
+import appConfig from '@/config/app.config';
 
 @Injectable()
 @OtelInstanceCounter()
@@ -31,17 +31,18 @@ export default class AuditService {
       auditable?: string;
     },
   ) {
+    // Test
     let topic = '';
 
     switch (action) {
       case AuditAction.CREATED:
-        topic = appConstant.AUDIT_EVENT.CREATED;
+        topic = appConfig.AUDIT_EVENT.CREATED;
         break;
       case AuditAction.UPDATED:
-        topic = appConstant.AUDIT_EVENT.UPDATED;
+        topic = appConfig.AUDIT_EVENT.UPDATED;
         break;
       case AuditAction.DELETED:
-        topic = appConstant.AUDIT_EVENT.DELETED;
+        topic = appConfig.AUDIT_EVENT.DELETED;
         break;
       default:
         break;

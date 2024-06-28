@@ -13,36 +13,27 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { OtelInstanceCounter, OtelMethodCounter } from 'nestjs-otel';
 import UserService from './user.service';
 import GetUserResponse from './serializers/get-user.response';
-import GetUserValidator, {
-  GetUserParamsValidator,
-} from './validators/get-user.validator';
-import ListUserValidator, {
-  ListUserQueryValidator,
-} from './validators/list-user.validator';
+import { GetUserParamsValidator } from './validators/get-user.validator';
+import { ListUserQueryValidator } from './validators/list-user.validator';
 import ListUserResponse from './serializers/list-user.response';
-import CreateUserValidator, {
-  CreateUserBodyValidator,
-} from './validators/create-user.validator';
-import UpdateUserValidator, {
+import { CreateUserBodyValidator } from './validators/create-user.validator';
+import {
   UpdateUserBodyValidator,
   UpdateUserParamsValidator,
 } from './validators/update-user.validator';
 import UpdateUserResponse from './serializers/update-user.response';
-import DeleteUserValidator, {
-  DeleteUserParamsValidator,
-} from './validators/delete-user.validator';
+import { DeleteUserParamsValidator } from './validators/delete-user.validator';
 import DeleteUserResponse from './serializers/delete-user.response';
-import SuccessResponse from '@/shared/responses/success.response';
-import Authorization from '@/shared/decorators/authorization.decorator';
-import Validator from '@/shared/decorators/validator.decorator';
-import Serializer from '@/shared/decorators/serializer.decorator';
-import Authentication from '@/shared/decorators/authentication.decorator';
-import UseList from '@/shared/decorators/uselist.decorator';
-import Context from '@/shared/decorators/context.decorator';
-import { IContext } from '@/shared/interceptors/context.interceptor';
-import { ApiFilterQuery } from '@/shared/decorators/api-filter-query.decorator';
-import User from '@/shared/decorators/user.decorator';
-import { TUserCustomInformation } from '@/shared/types/user.type';
+import SuccessResponse from '@/core/base/frameworks/shared/responses/success.response';
+import Authorization from '@/core/base/frameworks/shared/decorators/authorization.decorator';
+import Serializer from '@/core/base/frameworks/shared/decorators/serializer.decorator';
+import Authentication from '@/core/base/frameworks/shared/decorators/authentication.decorator';
+import UseList from '@/core/base/frameworks/shared/decorators/uselist.decorator';
+import Context from '@/core/base/frameworks/shared/decorators/context.decorator';
+import { IContext } from '@/core/base/frameworks/shared/interceptors/context.interceptor';
+import { ApiFilterQuery } from '@/core/base/frameworks/shared/decorators/api-filter-query.decorator';
+import User from '@/core/base/frameworks/shared/decorators/user.decorator';
+import { TUserCustomInformation } from '@/core/base/frameworks/shared/types/user.type';
 
 @ApiTags('User')
 @ApiBearerAuth('access-token')
@@ -69,7 +60,6 @@ export default class UserController {
   @Authentication(true)
   @Authorization('users:read@auth')
   @UseList()
-  @Validator(ListUserValidator)
   @Serializer(ListUserResponse)
   @ApiFilterQuery('filters', ListUserQueryValidator)
   @OtelMethodCounter()
@@ -83,12 +73,9 @@ export default class UserController {
   @HttpCode(HttpStatus.OK)
   @Authentication(true)
   @Authorization('users:read@auth')
-  @Validator(GetUserValidator)
   @Serializer(GetUserResponse)
   @OtelMethodCounter()
-  public async get(
-    @Param() params: GetUserParamsValidator,
-  ): Promise<SuccessResponse> {
+  public async get(@Param() params: GetUserParamsValidator): Promise<SuccessResponse> {
     const result = await this.userService.get(params);
 
     return new SuccessResponse('User fetch Successfully', result);
@@ -98,7 +85,6 @@ export default class UserController {
   @HttpCode(HttpStatus.CREATED)
   @Authentication(true)
   @Authorization('user:update@auth')
-  @Validator(UpdateUserValidator)
   @Serializer(UpdateUserResponse)
   @OtelMethodCounter()
   public async update(
@@ -115,7 +101,6 @@ export default class UserController {
   @HttpCode(HttpStatus.OK)
   @Authentication(true)
   @Authorization('users:create@auth')
-  @Validator(CreateUserValidator)
   @Serializer(GetUserResponse)
   @OtelMethodCounter()
   public async create(
@@ -132,7 +117,6 @@ export default class UserController {
   @HttpCode(HttpStatus.CREATED)
   @Authentication(true)
   @Authorization('users:delete@auth')
-  @Validator(DeleteUserValidator)
   @Serializer(DeleteUserResponse)
   @OtelMethodCounter()
   public async delete(

@@ -4,13 +4,13 @@ import { Permission } from '@prisma/client';
 import { IContext } from '@shared/interceptors/context.interceptor';
 import { parseMeta, parseQuery } from '@shared/utils/query.util';
 
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { TListPermissionRequestQuery } from './requests/list-permission.request';
 import permissionException from './permission.exception';
 import { GetPermissionParamsValidator } from './validators/get-permission.validator';
-import PrismaService from '@/prisma/prisma.service';
-import log from '@/shared/utils/log.util';
-import { UnknownException } from '@/shared/exceptions/common.exception';
+import PrismaService from '@/core/base/frameworks/data-services/prisma.service';
+import log from '@utils/log.util';
+import { UnknownException } from '@/core/base/frameworks/shared/exceptions/common.exception';
 
 @Injectable()
 export default class PermissionService {
@@ -22,8 +22,7 @@ export default class PermissionService {
   }> {
     const query = ctx.params.query as TListPermissionRequestQuery;
 
-    const { limit, offset, order, page } =
-      parseQuery<TListPermissionRequestQuery>(query);
+    const { limit, offset, order, page } = parseQuery<TListPermissionRequestQuery>(query);
 
     const selectOptions = {
       orderBy: order,
@@ -70,10 +69,7 @@ export default class PermissionService {
     }
   }
 
-  public async get(
-    ctx: IContext,
-    params: GetPermissionParamsValidator,
-  ): Promise<Permission> {
+  public async get(ctx: IContext, params: GetPermissionParamsValidator): Promise<Permission> {
     const permission = await this.db.permission.findUnique({
       where: { id: params.id },
     });

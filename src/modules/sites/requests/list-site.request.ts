@@ -1,7 +1,4 @@
 import { Prisma, Site } from '@prisma/client';
-import { IListRequestQuery } from '@/shared/types/query.type';
+import { IListRequestQuery } from '@/core/base/frameworks/shared/types/query.type';
 
-export type TListSiteRequestQuery = IListRequestQuery<
-  Site,
-  Prisma.SiteWhereInput
->;
+export type TListSiteRequestQuery = IListRequestQuery<Site, Prisma.SiteWhereInput>;

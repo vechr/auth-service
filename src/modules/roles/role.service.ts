@@ -1,22 +1,19 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { AuditAction } from '../audits/types/audit-enum.type';
 import AuditService from '../audits/audit.service';
 import { TListRoleRequestQuery } from './requests/list-role.request';
 import roleException from './role.exception';
 import { IGetRoleRequestParams } from './requests/get-role.request';
 import { ICreateRoleRequestBody } from './requests/create-role.request';
-import {
-  IUpdateRoleRequestBody,
-  IUpdateRoleRequestParams,
-} from './requests/update-role.request';
-import PrismaService from '@/prisma/prisma.service';
-import { IContext } from '@/shared/interceptors/context.interceptor';
-import { parseMeta, parseQuery } from '@/shared/utils/query.util';
-import log from '@/shared/utils/log.util';
-import { UnknownException } from '@/shared/exceptions/common.exception';
-import { Auditable } from '@/shared/types/auditable.type';
+import { IUpdateRoleRequestBody, IUpdateRoleRequestParams } from './requests/update-role.request';
+import PrismaService from '@/core/base/frameworks/data-services/prisma.service';
+import { IContext } from '@/core/base/frameworks/shared/interceptors/context.interceptor';
+import { parseMeta, parseQuery } from '@shared/utils/query.util';
+import log from '@utils/log.util';
+import { UnknownException } from '@/core/base/frameworks/shared/exceptions/common.exception';
+import { Auditable } from '@/core/base/frameworks/shared/types/auditable.type';
 
 @Injectable()
 export default class RoleService {
@@ -31,8 +28,7 @@ export default class RoleService {
   }> {
     const query = ctx.params.query as TListRoleRequestQuery;
 
-    const { limit, offset, order, page } =
-      parseQuery<TListRoleRequestQuery>(query);
+    const { limit, offset, order, page } = parseQuery<TListRoleRequestQuery>(query);
 
     const selectOptions = {
       orderBy: order,
@@ -173,10 +169,7 @@ export default class RoleService {
     }
   }
 
-  public async delete(
-    ctx: IContext,
-    params: IUpdateRoleRequestParams,
-  ): Promise<Role> {
+  public async delete(ctx: IContext, params: IUpdateRoleRequestParams): Promise<Role> {
     const currentRole = await this.db.role.findUnique({
       where: { id: params.id },
       include: this.includes(),

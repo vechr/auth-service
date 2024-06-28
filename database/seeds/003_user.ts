@@ -1,6 +1,6 @@
 import { Prisma, User } from '@prisma/client';
-import appConstant from '../../src/constants/app.constant';
-import { generatePassword } from '../../src/shared/utils/password.util';
+import appConstant from '../../src/config/app.config';
+import { generatePassword } from '../../src/core/base/frameworks/shared/utils/password.util';
 
 type TUserSeed = {
   where: Partial<User>;

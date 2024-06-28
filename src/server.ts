@@ -1,18 +1,32 @@
+// Start the Open telemetry
+import otelSDK from './tracing';
+otelSDK.start();
+
+// Start the application
 import { join } from 'path';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
-import log from '@shared/utils/log.util';
-import HttpExceptionFilter from '@shared/filters/http.filter';
-import UnknownExceptionsFilter from '@shared/filters/unknown.filter';
+import HttpExceptionFilter from '@filters/http.filter';
+import UnknownExceptionsFilter from '@filters/unknown.filter';
 import { VersioningType } from '@nestjs/common';
 import express from 'express';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerCustomOptions, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
-import otelSDK from './tracing';
+import ValidationPipe from '@pipes/validation.pipe';
+import * as expressWinston from 'express-winston';
 import HttpModule from './app.module';
-import appConstant from './constants/app.constant';
-import ContextInterceptor from './shared/interceptors/context.interceptor';
+import appConfig from './config/app.config';
+import ContextInterceptor from './core/base/frameworks/shared/interceptors/context.interceptor';
+import { log, winstonExpressOptions } from './core/base/frameworks/shared/utils/log.util';
+
+const printConfig = () => {
+  log.info(`Connected to Grafana Loki: ${appConfig.LOKI_HOST}`);
+  log.info(`Connected to Grafana Tempo: ${appConfig.OTLP_HTTP_URL}`);
+  log.info(`Application Name: ${appConfig.APP_NAME}`);
+  log.info(`JWT Expiration: ${appConfig.JWT_EXPIRES_IN}`);
+  log.info(`Refresh JWT Expiration: ${appConfig.JWT_REFRESH_EXPIRES_IN}`);
+};
 
 const appServer = new Promise(async (resolve, reject) => {
   try {
@@ -22,20 +36,15 @@ const appServer = new Promise(async (resolve, reject) => {
     app.connectMicroservice<MicroserviceOptions>({
       transport: Transport.NATS,
       options: {
-        servers: [appConstant.NATS_URL],
+        servers: [appConfig.NATS_URL],
         maxReconnectAttempts: 10,
         tls: {
-          caFile: appConstant.NATS_CA,
-          keyFile: appConstant.NATS_KEY,
-          certFile: appConstant.NATS_CERT,
+          caFile: appConfig.NATS_CA,
+          keyFile: appConfig.NATS_KEY,
+          certFile: appConfig.NATS_CERT,
         },
       },
     });
-    await app
-      .startAllMicroservices()
-      .then(() =>
-        log.info(`Nest app NATS started at :${appConstant.NATS_URL} `),
-      );
 
     // Set prefix api globally
     app.setGlobalPrefix('api', { exclude: ['health', '/'] });
@@ -46,11 +55,10 @@ const appServer = new Promise(async (resolve, reject) => {
       origin: true,
     });
 
+    app.useGlobalPipes(new ValidationPipe());
+
     // Use Exception Filter
-    app.useGlobalFilters(
-      new UnknownExceptionsFilter(),
-      new HttpExceptionFilter(),
-    );
+    app.useGlobalFilters(new UnknownExceptionsFilter(), new HttpExceptionFilter());
 
     // Versioning of default URL V1
     app.enableVersioning({
@@ -62,17 +70,16 @@ const appServer = new Promise(async (resolve, reject) => {
     app.useGlobalInterceptors(new ContextInterceptor());
 
     // Serve public images
-    app.use(
-      '/api/auth/public',
-      express.static(join(__dirname, '../../', 'public')),
-    );
+    app.use('/api/auth/public', express.static(join(__dirname, '../../', 'public')));
 
     // Use Cookie for http only
     app.use(cookieParser());
-    const option = {
+
+    const option: SwaggerCustomOptions = {
       customCss: `
-      .topbar-wrapper img {content:url('/api/auth/public/logo.svg'); width:200px; height:auto;}
-      .swagger-ui .topbar { background: linear-gradient(45deg, rgba(0,209,255,1) 42%, rgba(0,217,139,1) 100%); }`,
+      .topbar-wrapper a {content: url('/api/auth/public/logo.svg'); max-width: 200px !important; height:auto; margin-bottom: 0 !important; margin-top: 0 !important;}
+      .topbar-wrapper a svg {display: none;}
+      .swagger-ui .topbar {  background: linear-gradient(45deg, rgba(0,209,255,1) 42%, rgba(0,217,139,1) 100%); }`,
       customfavIcon: `/api/auth/public/logo.svg`,
       customSiteTitle: 'Vechr API Auth Services',
     };
@@ -96,11 +103,19 @@ const appServer = new Promise(async (resolve, reject) => {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('/api/auth', app, document, option);
 
+    const port = process.env.PORT ?? appConfig.APP_PORT;
+
+    // express-winston logger makes sense BEFORE the router
+    app.use(expressWinston.logger(winstonExpressOptions));
+
     await app
-      .listen(appConstant.APP_PORT)
-      .then(() =>
-        log.info(`Nest app http started at PORT: ${appConstant.APP_PORT}`),
-      );
+      .startAllMicroservices()
+      .then(() => log.info(`Nest app NATS started at :${appConfig.NATS_URL} `));
+
+    await app.listen(port).then(() => log.info(`Nest app http started at PORT: ${port}`));
+
+    // print config
+    printConfig();
 
     resolve(true);
   } catch (error) {
@@ -109,7 +124,5 @@ const appServer = new Promise(async (resolve, reject) => {
 });
 
 (async function () {
-  if (appConstant.OTLP_HTTP_URL && appConstant.OTLP_HTTP_URL != '')
-    otelSDK.start();
   await Promise.all([appServer]);
 })();

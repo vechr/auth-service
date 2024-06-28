@@ -1,27 +1,22 @@
-import {
-  HttpStatus,
-  Inject,
-  Injectable,
-  OnApplicationBootstrap,
-} from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Session } from '@prisma/client';
 import { instanceToPlain } from 'class-transformer';
 import dayjs from 'dayjs';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import sessionException from './session.exception';
-import PrismaService from '@/prisma/prisma.service';
-import { IContext } from '@/shared/interceptors/context.interceptor';
+import PrismaService from '@/core/base/frameworks/data-services/prisma.service';
+import { IContext } from '@/core/base/frameworks/shared/interceptors/context.interceptor';
 import {
   TUserCustomInformation,
   TUserFullInformation,
-} from '@/shared/types/user.type';
-import { generateJwt, IGeneratedJwt } from '@/shared/utils/jwt.util';
-import { requestReply } from '@/shared/utils/nats.util';
-import { checkPassword } from '@/shared/utils/password.util';
-import { transformUserToCustomInformation } from '@/shared/utils/user.util';
-import log from '@/shared/utils/log.util';
-import { UnknownException } from '@/shared/exceptions/common.exception';
+} from '@/core/base/frameworks/shared/types/user.type';
+import { generateJwt, IGeneratedJwt } from '@utils/jwt.util';
+import { requestReply } from '@/core/base/frameworks/shared/utils/nats.util';
+import { checkPassword } from '@/core/base/frameworks/shared/utils/password.util';
+import { transformUserToCustomInformation } from '@/core/base/frameworks/shared/utils/user.util';
+import log from '@utils/log.util';
+import { UnknownException } from '@/core/base/frameworks/shared/exceptions/common.exception';
 
 type TCreate = {
   username: string;
@@ -69,10 +64,7 @@ export default class SessionService implements OnApplicationBootstrap {
     }
   }
 
-  public async create(
-    ctx: IContext,
-    { username, password }: TCreate,
-  ): Promise<Session> {
+  public async create(ctx: IContext, { username, password }: TCreate): Promise<Session> {
     const headers = Object.assign({}, ctx.headers);
 
     delete headers['authorization'];
@@ -96,8 +88,7 @@ export default class SessionService implements OnApplicationBootstrap {
 
   public async refresh(ctx: IContext): Promise<Session> {
     const refreshToken = ctx.refreshToken;
-    if (refreshToken === undefined)
-      throw new sessionException.RefreshTokenNotFound();
+    if (refreshToken === undefined) throw new sessionException.RefreshTokenNotFound();
 
     const user = ctx.user as TUserCustomInformation;
     const headers = Object.assign({}, ctx.headers);
@@ -145,10 +136,7 @@ export default class SessionService implements OnApplicationBootstrap {
     return session;
   }
 
-  private async login(
-    ctx: IContext,
-    { username, password }: TLogin,
-  ): Promise<TDataLogin> {
+  private async login(ctx: IContext, { username, password }: TLogin): Promise<TDataLogin> {
     const user = await requestReply<TUserFullInformation>(
       this.client,
       'auth.user.findCompleteByUsername',

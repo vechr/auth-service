@@ -13,35 +13,26 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { OtelInstanceCounter, OtelMethodCounter } from 'nestjs-otel';
 import RoleService from './role.service';
 import ListRoleResponse from './serializers/list-role.response';
-import ListRoleValidator, {
-  ListRoleQueryValidator,
-} from './validators/list-role.validator';
-import GetRoleValidator, {
-  GetRoleParamsValidator,
-} from './validators/get-role.validator';
+import { ListRoleQueryValidator } from './validators/list-role.validator';
+import { GetRoleParamsValidator } from './validators/get-role.validator';
 import GetRoleResponse from './serializers/get-role.response';
-import CreateRoleValidator, {
-  CreateRoleBodyValidator,
-} from './validators/create-role.validator';
-import UpdateRoleValidator, {
+import { CreateRoleBodyValidator } from './validators/create-role.validator';
+import {
   UpdateRoleBodyValidator,
   UpdateRoleParamsValidator,
 } from './validators/update-role.validator';
 import UpdateRoleResponse from './serializers/update-role.response';
 import CreateRoleResponse from './serializers/create-role.response';
-import DeleteRoleValidator, {
-  DeleteRoleParamsValidator,
-} from './validators/delete-role.validator';
+import { DeleteRoleParamsValidator } from './validators/delete-role.validator';
 import DeleteRoleResponse from './serializers/delete-role.response';
-import Context from '@/shared/decorators/context.decorator';
-import { IContext } from '@/shared/interceptors/context.interceptor';
-import SuccessResponse from '@/shared/responses/success.response';
-import Authentication from '@/shared/decorators/authentication.decorator';
-import Authorization from '@/shared/decorators/authorization.decorator';
-import UseList from '@/shared/decorators/uselist.decorator';
-import Validator from '@/shared/decorators/validator.decorator';
-import Serializer from '@/shared/decorators/serializer.decorator';
-import { ApiFilterQuery } from '@/shared/decorators/api-filter-query.decorator';
+import Context from '@/core/base/frameworks/shared/decorators/context.decorator';
+import { IContext } from '@/core/base/frameworks/shared/interceptors/context.interceptor';
+import SuccessResponse from '@/core/base/frameworks/shared/responses/success.response';
+import Authentication from '@/core/base/frameworks/shared/decorators/authentication.decorator';
+import Authorization from '@/core/base/frameworks/shared/decorators/authorization.decorator';
+import UseList from '@/core/base/frameworks/shared/decorators/uselist.decorator';
+import Serializer from '@/core/base/frameworks/shared/decorators/serializer.decorator';
+import { ApiFilterQuery } from '@/core/base/frameworks/shared/decorators/api-filter-query.decorator';
 
 @ApiTags('Role')
 @ApiBearerAuth('access-token')
@@ -68,7 +59,6 @@ export default class RoleController {
   @Authentication(true)
   @Authorization('roles:read@auth')
   @UseList()
-  @Validator(ListRoleValidator)
   @Serializer(ListRoleResponse)
   @ApiFilterQuery('filters', ListRoleQueryValidator)
   @OtelMethodCounter()
@@ -82,12 +72,9 @@ export default class RoleController {
   @HttpCode(HttpStatus.OK)
   @Authentication(true)
   @Authorization('roles:read@auth')
-  @Validator(GetRoleValidator)
   @Serializer(GetRoleResponse)
   @OtelMethodCounter()
-  public async get(
-    @Param() params: GetRoleParamsValidator,
-  ): Promise<SuccessResponse> {
+  public async get(@Param() params: GetRoleParamsValidator): Promise<SuccessResponse> {
     const result = await this.roleService.get(params);
 
     return new SuccessResponse('role fetched successfully', result);
@@ -97,7 +84,6 @@ export default class RoleController {
   @HttpCode(HttpStatus.CREATED)
   @Authentication(true)
   @Authorization('roles:create@auth')
-  @Validator(CreateRoleValidator)
   @Serializer(CreateRoleResponse)
   @OtelMethodCounter()
   public async create(
@@ -113,7 +99,6 @@ export default class RoleController {
   @HttpCode(HttpStatus.CREATED)
   @Authentication(true)
   @Authorization('roles@update@auth')
-  @Validator(UpdateRoleValidator)
   @Serializer(UpdateRoleResponse)
   @OtelMethodCounter()
   public async update(
@@ -130,7 +115,6 @@ export default class RoleController {
   @HttpCode(HttpStatus.CREATED)
   @Authentication(true)
   @Authorization('roles:delete@auth')
-  @Validator(DeleteRoleValidator)
   @Serializer(DeleteRoleResponse)
   @OtelMethodCounter()
   public async delete(

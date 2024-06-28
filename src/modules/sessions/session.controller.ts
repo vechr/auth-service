@@ -1,28 +1,18 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { OtelInstanceCounter, OtelMethodCounter } from 'nestjs-otel';
 import SessionService from './session.service';
-import CreateSessionValidator, {
-  CreateSessionBodyValidator,
-} from './validators/create-session.validator';
+import { CreateSessionBodyValidator } from './validators/create-session.validator';
 import CreateSessionResponse from './serializers/create-session.response';
 import RefreshSessionResponse from './serializers/refresh-session.response';
-import Context from '@/shared/decorators/context.decorator';
-import { IContext } from '@/shared/interceptors/context.interceptor';
-import SuccessResponse from '@/shared/responses/success.response';
-import Validator from '@/shared/decorators/validator.decorator';
-import Serializer from '@/shared/decorators/serializer.decorator';
-import Authentication from '@/shared/decorators/authentication.decorator';
-import User from '@/shared/decorators/user.decorator';
-import { TUserCustomInformation } from '@/shared/types/user.type';
-import CookieAuthentication from '@/shared/decorators/cookie-auth.decorator';
+import Context from '@/core/base/frameworks/shared/decorators/context.decorator';
+import { IContext } from '@/core/base/frameworks/shared/interceptors/context.interceptor';
+import SuccessResponse from '@/core/base/frameworks/shared/responses/success.response';
+import Serializer from '@/core/base/frameworks/shared/decorators/serializer.decorator';
+import Authentication from '@/core/base/frameworks/shared/decorators/authentication.decorator';
+import User from '@/core/base/frameworks/shared/decorators/user.decorator';
+import { TUserCustomInformation } from '@/core/base/frameworks/shared/types/user.type';
+import CookieAuthentication from '@/core/base/frameworks/shared/decorators/cookie-auth.decorator';
 @ApiTags('Session')
 @Controller('auth/sessions')
 @OtelInstanceCounter()
@@ -34,9 +24,7 @@ export default class SessionController {
   @HttpCode(HttpStatus.OK)
   @Authentication(true)
   @OtelMethodCounter()
-  public async getMe(
-    @User() user: TUserCustomInformation,
-  ): Promise<SuccessResponse> {
+  public async getMe(@User() user: TUserCustomInformation): Promise<SuccessResponse> {
     return new SuccessResponse('success get information!', user);
   }
 
@@ -46,9 +34,7 @@ export default class SessionController {
   @Authentication(true)
   @CookieAuthentication('logout')
   @OtelMethodCounter()
-  public async logout(
-    @User() user: TUserCustomInformation,
-  ): Promise<SuccessResponse> {
+  public async logout(@User() user: TUserCustomInformation): Promise<SuccessResponse> {
     if (user.id) await this.sessionService.logout(user.id);
     return new SuccessResponse('logout success!', true);
   }
@@ -64,7 +50,6 @@ export default class SessionController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @Validator(CreateSessionValidator)
   @Serializer(CreateSessionResponse)
   @CookieAuthentication('login')
   @OtelMethodCounter()

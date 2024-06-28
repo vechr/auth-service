@@ -6,21 +6,16 @@ import { IContext } from '@shared/interceptors/context.interceptor';
 import Authentication from '@shared/decorators/authentication.decorator';
 import Authorization from '@shared/decorators/authorization.decorator';
 import Serializer from '@shared/decorators/serializer.decorator';
-import Validator from '@shared/decorators/validator.decorator';
 import UseList from '@shared/decorators/uselist.decorator';
 
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { OtelInstanceCounter, OtelMethodCounter } from 'nestjs-otel';
 import PermissionService from './permission.service';
-import ListPermissionValidator, {
-  ListPermissionQueryValidator,
-} from './validators/list-permission.validator';
+import { ListPermissionQueryValidator } from './validators/list-permission.validator';
 import ListPermissionResponse from './serializers/list-permission.response';
 import GetPermissionResponse from './serializers/get-permission.response';
-import GetPermissionValidator, {
-  GetPermissionParamsValidator,
-} from './validators/get-permission.validator';
-import { ApiFilterQuery } from '@/shared/decorators/api-filter-query.decorator';
+import { GetPermissionParamsValidator } from './validators/get-permission.validator';
+import { ApiFilterQuery } from '@/core/base/frameworks/shared/decorators/api-filter-query.decorator';
 
 @ApiTags('Permission')
 @ApiBearerAuth('access-token')
@@ -46,7 +41,6 @@ export default class PermissionController {
   @Authentication(true)
   @Authorization('permissions:read@auth')
   @UseList()
-  @Validator(ListPermissionValidator)
   @Serializer(ListPermissionResponse)
   @ApiFilterQuery('filters', ListPermissionQueryValidator)
   @OtelMethodCounter()
@@ -60,7 +54,6 @@ export default class PermissionController {
   @HttpCode(HttpStatus.OK)
   @Authentication(true)
   @Authorization('permissions:read@auth')
-  @Validator(GetPermissionValidator)
   @Serializer(GetPermissionResponse)
   @OtelMethodCounter()
   public async get(

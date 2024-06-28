@@ -1,5 +1,5 @@
 import { Site } from '@prisma/client';
-import appConstant from '../../src/constants/app.constant';
+import appConstant from '../../src/config/app.config';
 
 type TSiteSeed = {
   where: Partial<Site>;
