@@ -11,7 +11,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { RedisClientOptions } from '@redis/client';
 import { redisStore } from 'cache-manager-redis-yet';
 import appConfig from './config/app.config';
-import { RegistrationModule } from './core/modules/registration.module';
+import { RegistrationModule } from './modules/registration.module';
 
 const OpenTelemetryModuleConfig = OpenTelemetryModule.forRoot({
   metrics: {
