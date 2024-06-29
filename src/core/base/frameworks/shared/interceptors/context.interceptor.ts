@@ -1,5 +1,6 @@
 import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
+import { TCompactAuthUser } from '@/core/base/domain/entities/auth.entity';
 
 export interface IContextParams {
   params: Record<string, any>;
@@ -9,7 +10,7 @@ export interface IContextParams {
 
 export interface IContext {
   headers: Record<string, any>;
-  user: any;
+  user: TCompactAuthUser;
   accessToken?: string;
   refreshToken?: string;
   params: IContextParams;
@@ -27,6 +28,8 @@ export default class ContextInterceptor implements NestInterceptor {
       }
     >();
 
+    // It's must be implement the cookies parser, otherwise will error
+
     const context: IContext = {
       headers: request.headers,
       user: request.user,
@@ -36,7 +39,9 @@ export default class ContextInterceptor implements NestInterceptor {
         body: request.body as Record<string, any>,
       },
       accessToken:
-        request.cookies['access-token'] === undefined ? undefined : request.cookies['access-token'],
+        request.cookies['access-token'] === undefined
+          ? undefined
+          : request.cookies['access-token'],
       refreshToken:
         request.cookies['refresh-token'] === undefined
           ? undefined

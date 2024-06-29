@@ -17,6 +17,8 @@
       "@pipes/*": ["./src/core/base/frameworks/shared/pipes/*"],
       "@responses/*": ["./src/core/base/frameworks/shared/responses/*"],
       "@utils/*": ["./src/core/base/frameworks/shared/utils/*"],
+      "@health/*": ["./src/core/base/frameworks/health/*"],
+      "@data-services/*": ["./src/core/base/frameworks/data-services/*"],
     },
     "strictPropertyInitialization": false,
     "resolveJsonModule": true,

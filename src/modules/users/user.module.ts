@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-
-import AuditAuthService from '../audits/audit.service';
-import UserController from './user.controller';
-import UserNatsController from './user.nats';
-import UserService from './user.service';
+import UserNatsController from './infrastructure/user-nats.controller';
 import appConfig from '@/config/app.config';
-import PrismaService from '@/core/base/frameworks/data-services/prisma.service';
+import PrismaService from '@/core/base/frameworks/data-services/prisma/prisma.service';
+import { UserController } from './infrastructure/user.controller';
+import { UserRepository } from './data/user.repository';
+import { UserUseCase } from './domain/usecase/user.usecase';
 
 @Module({
   imports: [
@@ -27,6 +26,7 @@ import PrismaService from '@/core/base/frameworks/data-services/prisma.service';
     ]),
   ],
   controllers: [UserController, UserNatsController],
-  providers: [UserService, PrismaService, AuditAuthService],
+  providers: [PrismaService, UserUseCase, UserRepository],
+  exports: [UserRepository],
 })
 export default class UserModule {}

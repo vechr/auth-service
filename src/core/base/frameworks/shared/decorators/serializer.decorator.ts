@@ -5,6 +5,8 @@ interface ClassConstructor {
   new (...args: any[]): any;
 }
 
-export default function Serializer(dto: ClassConstructor): MethodDecorator & ClassDecorator {
+export default function Serializer(
+  dto: ClassConstructor,
+): MethodDecorator & ClassDecorator {
   return UseInterceptors(new SerializerInterceptor(dto));
 }

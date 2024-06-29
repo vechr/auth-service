@@ -1,7 +1,6 @@
 import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
+import { Observable, map } from 'rxjs';
 import { plainToInstance } from 'class-transformer';
-import { map, Observable } from 'rxjs';
-
 import SuccessResponse from '../responses/success.response';
 
 interface ClassConstructor {
@@ -11,7 +10,10 @@ interface ClassConstructor {
 export default class SerializerInterceptor implements NestInterceptor {
   constructor(private dto: ClassConstructor) {}
 
-  intercept(ctx: ExecutionContext, handler: CallHandler): Observable<any> {
+  intercept(
+    context: ExecutionContext,
+    handler: CallHandler<any>,
+  ): Observable<any> {
     return handler.handle().pipe(
       map((data: SuccessResponse) => {
         const plainResult = data.getResult();

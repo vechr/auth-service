@@ -3,16 +3,15 @@ import { OpenTelemetryModule } from 'nestjs-otel';
 import { TerminusModule } from '@nestjs/terminus';
 import { WinstonModule } from 'nest-winston';
 import { winstonModuleOptions } from '@utils/log.util';
-import { PrismaModule } from './core/base/frameworks/data-services/prisma.module';
-import UserModule from './modules/users/user.module';
 import AuthModule from './core/base/frameworks/auth/auth.module';
-import { SessionModule } from './modules/sessions/session.module';
-import PermissionModule from './modules/permissions/permission.module';
-import SiteModule from './modules/sites/site.module';
-import RoleModule from './modules/roles/role.module';
-import AuditAuthModule from './modules/audits/audit.module';
 import { InstrumentMiddleware } from './core/base/frameworks/shared/middlewares/instrument.middleware';
-import HealthModule from './modules/health/health.module';
+import HealthModule from '@health/health.module';
+import { CoreModule } from './core/modules/core.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { RedisClientOptions } from '@redis/client';
+import { redisStore } from 'cache-manager-redis-yet';
+import appConfig from './config/app.config';
+import { RegistrationModule } from './core/modules/registration.module';
 
 const OpenTelemetryModuleConfig = OpenTelemetryModule.forRoot({
   metrics: {
@@ -29,24 +28,27 @@ const WinstonLoggerModule = WinstonModule.forRootAsync({
 
 @Module({
   imports: [
+    // framework
+    TerminusModule,
     OpenTelemetryModuleConfig,
     WinstonLoggerModule,
-
-    PrismaModule,
-    AuthModule,
-
-    AuditAuthModule,
-    SessionModule,
-    UserModule,
-    PermissionModule,
-    SiteModule,
-    RoleModule,
-    TerminusModule,
     HealthModule,
+    AuthModule,
+    CacheModule.register<RedisClientOptions>({
+      store: redisStore,
+      isGlobal: true,
+      ttl: appConfig.REDIS_TTL,
+      url: appConfig.REDIS_URL,
+    }),
+
+    CoreModule,
+    RegistrationModule,
   ],
 })
 export default class HttpModule {
   configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(InstrumentMiddleware).forRoutes({ path: '*', method: RequestMethod.ALL });
+    consumer
+      .apply(InstrumentMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
   }
 }

@@ -1,12 +1,14 @@
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JsonWebTokenError } from 'jsonwebtoken';
-
-import { cookieExtractor, decryptedDataUser, IDecryptedJwt } from '@shared/utils/jwt.util';
+import {
+  IDecryptedJwt,
+  cookieExtractor,
+  decryptedDataUser,
+} from '../shared/utils/jwt.util';
+import { TCompactAuthUser } from '../../domain/entities/auth.entity';
 import appConfig from '@/config/app.config';
-
-import { TUserCustomInformation } from '@/core/base/frameworks/shared/types/user.type';
 
 const { fromExtractors, fromAuthHeaderAsBearerToken } = ExtractJwt;
 
@@ -27,7 +29,7 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
     return customUser;
   }
 
-  private async getCustomUser(jwt: IDecryptedJwt): Promise<TUserCustomInformation> {
+  private async getCustomUser(jwt: IDecryptedJwt): Promise<TCompactAuthUser> {
     const user = decryptedDataUser(jwt.payload);
 
     if (!user) {

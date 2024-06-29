@@ -1,44 +1,48 @@
 import { ArgumentMetadata, Injectable } from '@nestjs/common';
-import { instanceToInstance } from 'class-transformer';
+import { plainToClass } from 'class-transformer';
+import { validate } from 'class-validator';
+import { BadRequestException } from '../exceptions/common.exception';
 
-export type Enumerable<T> = T | Array<T>;
-
-export type StringFilter = {
-  equals?: string;
-  in?: Enumerable<string>;
-  notIn?: Enumerable<string>;
-  lt?: string;
-  lte?: string;
-  gt?: string;
-  gte?: string;
-  contains?: string;
-  startsWith?: string;
-  endsWith?: string;
-};
+interface ClassConstructor {
+  new (...args: any[]): any;
+}
 
 @Injectable()
 export default class ListQueryPipe {
+  constructor(private dto: ClassConstructor) {}
+
   public async transform(value: any, metadata: ArgumentMetadata) {
     if (
       metadata.type !== 'custom' ||
       !this.needValidate(value, metadata.metatype) ||
-      !Object.keys(value.params.query?.field || {}).length
+      !Object.keys(value.params.query?.filters.field || {}).length
     ) {
       return value;
     }
 
-    try {
-      const finalFieldQuery = instanceToInstance(value.params.query.field, {
-        excludeExtraneousValues: true,
-        exposeUnsetFields: false,
+    // Transform Query Format
+    const convertQuery = plainToClass(this.dto, value.params.query);
+
+    // Validate Query Format
+    const errors = await validate(convertQuery);
+
+    const customErrors = errors.map((err) => ({
+      field: err.property,
+      value: err.value,
+      errors: err.toString() + '\n' + err.constraints,
+    }));
+
+    if (errors.length > 0) {
+      throw new BadRequestException({
+        message: 'Validation failed!',
+        params: customErrors,
       });
-
-      value.params.query.field = finalFieldQuery;
-
-      return value;
-    } catch (error) {
-      return value;
     }
+
+    // Reassign Query
+    value.params.query = convertQuery;
+
+    return value;
   }
 
   private needValidate(value: any, metatype: any): boolean {

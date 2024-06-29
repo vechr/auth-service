@@ -9,7 +9,10 @@ export default class HttpExceptionFilter implements ExceptionFilter {
     const res = ctx.getResponse();
 
     const status = exception.getHttpCode();
-    const response = new ErrorResponse(exception.message, exception.getResponse());
+    const response = new ErrorResponse(
+      exception.message,
+      exception.getResponse(),
+    );
 
     res.status(status).json(response);
   }

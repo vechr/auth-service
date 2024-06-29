@@ -11,18 +11,31 @@ import HttpExceptionFilter from '@filters/http.filter';
 import UnknownExceptionsFilter from '@filters/unknown.filter';
 import { VersioningType } from '@nestjs/common';
 import express from 'express';
-import { DocumentBuilder, SwaggerCustomOptions, SwaggerModule } from '@nestjs/swagger';
+import {
+  DocumentBuilder,
+  SwaggerCustomOptions,
+  SwaggerModule,
+} from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import ValidationPipe from '@pipes/validation.pipe';
 import * as expressWinston from 'express-winston';
 import HttpModule from './app.module';
 import appConfig from './config/app.config';
 import ContextInterceptor from './core/base/frameworks/shared/interceptors/context.interceptor';
-import { log, winstonExpressOptions } from './core/base/frameworks/shared/utils/log.util';
+import {
+  log,
+  winstonExpressOptions,
+} from './core/base/frameworks/shared/utils/log.util';
 
 const printConfig = () => {
+  log.info(`Connected to Redis: ${appConfig.REDIS_URL}`);
   log.info(`Connected to Grafana Loki: ${appConfig.LOKI_HOST}`);
   log.info(`Connected to Grafana Tempo: ${appConfig.OTLP_HTTP_URL}`);
+  log.info(
+    `Cookie Configuration => Samesite: ${appConfig.COOKIE_SAME_SITE}, Secure: ${
+      appConfig.COOKIE_SECURE ? 'yes' : 'no'
+    }, HTTP Only: ${appConfig.COOKIE_HTTP_ONLY ? 'yes' : 'no'}`,
+  );
   log.info(`Application Name: ${appConfig.APP_NAME}`);
   log.info(`JWT Expiration: ${appConfig.JWT_EXPIRES_IN}`);
   log.info(`Refresh JWT Expiration: ${appConfig.JWT_REFRESH_EXPIRES_IN}`);
@@ -58,7 +71,10 @@ const appServer = new Promise(async (resolve, reject) => {
     app.useGlobalPipes(new ValidationPipe());
 
     // Use Exception Filter
-    app.useGlobalFilters(new UnknownExceptionsFilter(), new HttpExceptionFilter());
+    app.useGlobalFilters(
+      new UnknownExceptionsFilter(),
+      new HttpExceptionFilter(),
+    );
 
     // Versioning of default URL V1
     app.enableVersioning({
@@ -70,7 +86,10 @@ const appServer = new Promise(async (resolve, reject) => {
     app.useGlobalInterceptors(new ContextInterceptor());
 
     // Serve public images
-    app.use('/api/auth/public', express.static(join(__dirname, '../../', 'public')));
+    app.use(
+      '/api/auth/public',
+      express.static(join(__dirname, '../../', 'public')),
+    );
 
     // Use Cookie for http only
     app.use(cookieParser());
@@ -112,7 +131,9 @@ const appServer = new Promise(async (resolve, reject) => {
       .startAllMicroservices()
       .then(() => log.info(`Nest app NATS started at :${appConfig.NATS_URL} `));
 
-    await app.listen(port).then(() => log.info(`Nest app http started at PORT: ${port}`));
+    await app
+      .listen(port)
+      .then(() => log.info(`Nest app http started at PORT: ${port}`));
 
     // print config
     printConfig();

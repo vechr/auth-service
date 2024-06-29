@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import AuditAuthService from '../audits/audit.service';
-import RoleController from './role.controller';
-import RoleService from './role.service';
 import appConfig from '@/config/app.config';
+import { RoleController } from './infrastructure/role.controller';
+import { RoleUseCase } from './domain/usecase/role.usecase';
+import { RoleRepository } from './data/role.repository';
+import PrismaService from '@/core/base/frameworks/data-services/prisma/prisma.service';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import appConfig from '@/config/app.config';
     ]),
   ],
   controllers: [RoleController],
-  providers: [RoleService, AuditAuthService],
+  providers: [RoleUseCase, RoleRepository, PrismaService],
+  exports: [RoleRepository],
 })
 export default class RoleModule {}

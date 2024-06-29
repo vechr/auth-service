@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-
-import AuditAuthService from '../audits/audit.service';
-import SiteController from './site.controller';
-import SiteService from './site.service';
 import appConfig from '@/config/app.config';
+import { SiteController } from './infrastructure/site.controller';
+import { SiteUseCase } from './domain/usecase/site.usecase';
+import { SiteRepository } from './data/site.repository';
+import PrismaService from '@/core/base/frameworks/data-services/prisma/prisma.service';
 
 @Module({
   imports: [
@@ -25,6 +25,7 @@ import appConfig from '@/config/app.config';
     ]),
   ],
   controllers: [SiteController],
-  providers: [SiteService, AuditAuthService],
+  providers: [SiteRepository, SiteUseCase, PrismaService],
+  exports: [SiteRepository],
 })
 export default class SiteModule {}

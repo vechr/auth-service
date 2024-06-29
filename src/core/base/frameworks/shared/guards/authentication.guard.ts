@@ -1,9 +1,12 @@
-import { Reflector } from '@nestjs/core';
-import { AuthGuard } from '@nestjs/passport';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
-import { ForbiddenException, UnauthorizedException } from '../exceptions/common.exception';
-import { TUserCustomInformation } from '../types/user.type';
-import { log } from '../utils/log.util';
+import { AuthGuard } from '@nestjs/passport';
+import { Reflector } from '@nestjs/core';
+import {
+  ForbiddenException,
+  UnauthorizedException,
+} from '../exceptions/common.exception';
+import log from '../utils/log.util';
+import { TCompactAuthUser } from '@/core/base/domain/entities/auth.entity';
 
 enum EErrorJwtCode {
   TOKEN_EXPIRED = 'T401',
@@ -16,58 +19,65 @@ export class AuthenticationGuard extends AuthGuard('jwt') {
     super();
   }
 
-  handleRequest<TUser = TUserCustomInformation>(
+  handleRequest<TUser = TCompactAuthUser>(
     err: any,
-    user: any,
+    user: TCompactAuthUser,
     info: any,
     context: any,
   ): TUser {
     if (info) {
       if (info instanceof TokenExpiredError) {
         throw new UnauthorizedException({
-          message: 'token expired',
+          message: 'Token expired!',
           code: EErrorJwtCode.TOKEN_EXPIRED,
           params: { message: info.message },
         });
       }
-      if (info.message === 'No auth token') {
+      if (info instanceof JsonWebTokenError) {
         throw new UnauthorizedException({
-          message: 'token required',
-          code: EErrorJwtCode.TOKEN_REQUIRED,
+          message: 'Token expired!',
+          code: EErrorJwtCode.TOKEN_EXPIRED,
           params: { message: info.message },
         });
       }
     }
 
     if (err || info || !user) {
-      if (err instanceof JsonWebTokenError || info instanceof JsonWebTokenError || !user) {
+      if (!user) {
         throw new UnauthorizedException({
-          message: 'invalid token',
+          message: 'Token required!',
+          code: EErrorJwtCode.TOKEN_REQUIRED,
+          params: {
+            message: err?.message || info?.message || 'user not found!',
+          },
+        });
+      } else {
+        throw new UnauthorizedException({
+          message: 'Invalid token!',
           code: EErrorJwtCode.TOKEN_INVALID,
           params: {
-            message: err?.message || info?.message || 'user not found',
+            message:
+              err?.message || info?.message || "it's look like token is wrong!",
           },
         });
       }
     }
 
-    const customUser = user as TUserCustomInformation;
-
     let isAuthorized = true;
     try {
-      const requiredRoles = [
-        'root',
+      const requiredRoles: string[] = [
+        'root', // Make Admin will have access for all features
         ...this.reflector.getAllAndOverride<string[]>('authorization', [
           context.getHandler(),
           context.getClass(),
         ]),
       ];
 
-      const intersectedPermission = requiredRoles.filter((value) =>
-        customUser.permissions.includes(value),
+      const intersectedRoles = requiredRoles.filter((value) =>
+        user.permissions.includes(value),
       );
 
-      isAuthorized = !!intersectedPermission.length;
+      isAuthorized = !!intersectedRoles.length;
     } catch (error) {
       const req = context.getRequest();
       log.warn(`skip authorization for ${req.route?.path || req.url}`);
@@ -77,6 +87,6 @@ export class AuthenticationGuard extends AuthGuard('jwt') {
       throw new ForbiddenException();
     }
 
-    return customUser as any;
+    return user as TUser;
   }
 }

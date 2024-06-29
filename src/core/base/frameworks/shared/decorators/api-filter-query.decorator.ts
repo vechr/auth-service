@@ -18,7 +18,7 @@ export function ApiFilterQuery(fieldName: string, filterDto: ClassConstructor) {
       required: false,
       name: fieldName,
       style: 'deepObject',
-      explode: true,
+      explode: false,
       type: 'object',
       description: `Example: http://your_host:your_port/your_route?filters[pagination][limit]=2&filters[pagination][page]=1&filters[sort][by]=createdAt&filters[sort][mode]=asc&filters[field][name][contains]=something about name </br> </br>
          You can filter more than this, please refer to this https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#filter-conditions-and-operators`,

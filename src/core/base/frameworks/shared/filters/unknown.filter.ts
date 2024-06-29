@@ -1,4 +1,10 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { UnknownException } from '../exceptions/common.exception';
 import ErrorResponse from '../responses/error.response';
 import log from '../utils/log.util';
@@ -36,10 +42,9 @@ export default class UnknownExceptionFilter implements ExceptionFilter {
       const response = new ErrorResponse(
         errMessage,
         typeof data === 'string'
-          ? { code: '500', message: data, params: {} }
+          ? { code: '500', params: {} }
           : {
               code: '500',
-              message: errMessage,
               params: data,
             },
       );

@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["tracing"]
 }
 
@@ -12,95 +12,90 @@ datasource db {
 }
 
 model Site {
-  id            String            @id @default(uuid()) @db.VarChar(36)
-  code          String            @unique @db.VarChar(15)
-  name          String            @db.VarChar(50)
-  location      String            @db.Text
-  description   String?           @db.Text
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-  users         User[]
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  code        String   @unique @db.VarChar(15)
+  name        String   @db.VarChar(50)
+  location    String   @db.Text
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]
 
-  @@map("sites")
+  @@map("Site")
 }
 
 model User {
-  id            String             @id @default(uuid()) @db.VarChar(36)
-  fullName      String             @db.VarChar(100)
-  emailAddress  String             @db.VarChar(50)
-  phoneNumber   String?            @db.VarChar(15)
-  description   String?            @db.Text
-  username      String             @unique @db.VarChar(50)
-  password      String             @db.Text
-  site          Site?              @relation(fields: [siteId], references: [id])
-  siteId        String             @db.VarChar(36)
-  roles         UsersRoles[]
-  sessions      Session[]
+  id          String  @id @default(uuid()) @db.VarChar(36)
+  name        String  @unique @db.VarChar(50)
+  description String? @db.Text
 
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  fullName    String?       @db.VarChar(100)
+  email       String?      @db.VarChar(50)
+  phoneNumber String?      @db.VarChar(15)
+  password    String       @db.Text
+  site        Site?        @relation(fields: [siteId], references: [id])
+  siteId      String       @db.VarChar(36)
+  roles       UserRole[]
+  sessions    Session[]
 
-  @@map("users")
-}
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-enum PermissionType {
-  Security
-  ProcessModelling
-  PhyscalModelling
-  Shopfloor
+  @@map("User")
 }
 
 model Permission {
-  id              String             @id @default(uuid()) @db.VarChar(36)
-  alias           String              @unique @db.VarChar(50)
-  name            String              @db.VarChar(50)
-  description     String?             @db.Text
-  permissionType  PermissionType?
-  role            RolesPermissions[]
+  id          String  @id @default(uuid()) @db.VarChar(36)
+  name        String  @unique @db.VarChar(50)
+  description String? @db.Text
 
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
-  
-  @@map("permissions")
+  alias String             @unique @db.VarChar(50)
+  role  RolePermission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("Permission")
 }
 
 model Role {
-  id            String             @id @default(uuid()) @db.VarChar(36)
-  name          String             @unique @db.VarChar(50)
-  description   String?            @db.Text
-  users         UsersRoles[]
-  permissions   RolesPermissions[]          
+  id          String  @id @default(uuid()) @db.VarChar(36)
+  name        String  @unique @db.VarChar(50)
+  description String? @db.Text
 
+  users       UserRole[]
+  permissions RolePermission[]
 
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@map("roles")
+  @@map("Role")
 }
 
-model RolesPermissions {
+model RolePermission {
   role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   roleId       String     @db.VarChar(36)
   permission   Permission @relation(fields: [permissionId], references: [id])
   permissionId String     @db.VarChar(36)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@id([roleId, permissionId])
-  @@map("roles_permissions")
+  @@map("RolePermission")
 }
 
-model UsersRoles {
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String   @db.VarChar(36)
-  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  roleId    String   @db.VarChar(36)
+model UserRole {
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.VarChar(36)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleId String @db.VarChar(36)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@id([userId, roleId])
-  @@map("users_roles")
+  @@map("UserRole")
 }
 
 model Session {
@@ -114,5 +109,5 @@ model Session {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("sessions")
+  @@map("Session")
 }

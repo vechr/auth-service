@@ -1,9 +1,10 @@
 import ms from 'ms';
 import * as jwt from 'jsonwebtoken';
 import suuid from 'short-uuid';
+
 import CryptoJS from 'crypto-js';
 import { ExtractJwt } from 'passport-jwt';
-import { TUserCustomInformation } from '../types/user.type';
+import { TCompactAuthUser } from '../../../domain/entities/auth.entity';
 import { rand, sha512 } from './security.util';
 import appConfig from '@/config/app.config';
 
@@ -33,7 +34,13 @@ export const generateRefresh = async (): Promise<string> => {
   return refresh;
 };
 
-export const generateExpiredDate = (): Date => {
+export const generateExpiredDateToken = (): Date => {
+  const expIn = appConfig.JWT_EXPIRES_IN;
+
+  return new Date(Date.now() + ms(expIn));
+};
+
+export const generateExpiredDateRefresh = (): Date => {
   const expIn = appConfig.JWT_REFRESH_EXPIRES_IN;
 
   return new Date(Date.now() + ms(expIn));
@@ -42,23 +49,25 @@ export const generateExpiredDate = (): Date => {
 export const generateJwt = async ({
   origin,
   userId,
-  siteCode,
   user,
 }: {
   origin: string;
   userId: string;
-  siteCode: string;
-  user: TUserCustomInformation;
+  user: TCompactAuthUser;
 }): Promise<IGeneratedJwt> => {
   const refresh = await generateRefresh();
-  const token = jwt.sign({ payload: encryptedDataUser(user) }, appConfig.JWT_SECRET, {
-    expiresIn: appConfig.JWT_EXPIRES_IN,
-    subject: translator.fromUUID(userId),
-    audience: origin,
-    issuer: `vechr:${siteCode}`,
-  });
+  const token = jwt.sign(
+    { payload: encryptedDataUser(user) },
+    appConfig.JWT_SECRET,
+    {
+      expiresIn: appConfig.JWT_EXPIRES_IN,
+      subject: translator.fromUUID(userId),
+      audience: origin,
+      issuer: `by_zulfikar:vechr.com`,
+    },
+  );
 
-  const expired = generateExpiredDate();
+  const expired = generateExpiredDateToken();
 
   return {
     refresh,
@@ -68,7 +77,10 @@ export const generateJwt = async ({
 };
 
 export const jwtOptions = {
-  jwtFromRequest: fromExtractors([cookieExtractor, fromAuthHeaderAsBearerToken()]),
+  jwtFromRequest: fromExtractors([
+    cookieExtractor,
+    fromAuthHeaderAsBearerToken(),
+  ]),
   secretOrKey: appConfig.JWT_SECRET,
   jwtCookieName: 'access-token',
 };
@@ -81,20 +93,26 @@ export function cookieExtractor(req: any) {
   return token;
 }
 
-export const encryptedDataUser = (user: TUserCustomInformation) => {
+export const encryptedDataUser = (user: TCompactAuthUser) => {
   return encodeURIComponent(
-    CryptoJS.AES.encrypt(JSON.stringify(user), appConfig.ECRYPTED_SECRET).toString(),
+    CryptoJS.AES.encrypt(
+      JSON.stringify(user),
+      appConfig.ECRYPTED_SECRET,
+    ).toString(),
   );
 };
 
 export const decryptedDataUser = (secureData: string) => {
-  const deData = CryptoJS.AES.decrypt(decodeURIComponent(secureData), appConfig.ECRYPTED_SECRET);
+  const deData = CryptoJS.AES.decrypt(
+    decodeURIComponent(secureData),
+    appConfig.ECRYPTED_SECRET,
+  );
 
   if (!isJsonString(deData.toString(CryptoJS.enc.Utf8))) {
     return null;
   }
 
-  return JSON.parse(deData.toString(CryptoJS.enc.Utf8)) as TUserCustomInformation;
+  return JSON.parse(deData.toString(CryptoJS.enc.Utf8)) as TCompactAuthUser;
 };
 
 export function isJsonString(str: string) {
