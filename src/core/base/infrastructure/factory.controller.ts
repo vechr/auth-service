@@ -145,7 +145,7 @@ export function ControllerFactory<
     @Serializer(upsertSerializer)
     @Authentication(true)
     @Authorization(`${rolePrefix}:create@auth`, `${rolePrefix}:update@auth`)
-    @ApiBody({ type: [upsertBodyValidator] })
+    @ApiBody({ type: upsertBodyValidator })
     public async upsert(
       @Context() ctx: IContext,
       @Body() body: UpsertBody,
@@ -164,7 +164,7 @@ export function ControllerFactory<
     @Serializer(createSerializer)
     @Authentication(true)
     @Authorization(`${rolePrefix}:create@auth`)
-    @ApiBody({ type: [createBodyValidator] })
+    @ApiBody({ type: createBodyValidator })
     public async create(
       @Context() ctx: IContext,
       @Body() body: CreateBody,
@@ -184,7 +184,7 @@ export function ControllerFactory<
     @Authentication(true)
     @Authorization(`${rolePrefix}:read@auth`)
     @ApiParam({
-      type: [getParamValidator],
+      type: getParamValidator,
       name: 'id',
       example: '1def564a-42d9-4a94-9bf8-c9c6e4d796a6',
       description: 'ID!',
@@ -204,9 +204,9 @@ export function ControllerFactory<
     @Serializer(updateSerializer)
     @Authentication(true)
     @Authorization(`${rolePrefix}:update@auth`)
-    @ApiBody({ type: [updateBodyValidator] })
+    @ApiBody({ type: updateBodyValidator })
     @ApiParam({
-      type: [updateParamValidator],
+      type: updateParamValidator,
       name: 'id',
       example: '1def564a-42d9-4a94-9bf8-c9c6e4d796a6',
       description: 'ID!',
@@ -231,7 +231,7 @@ export function ControllerFactory<
     @Authentication(true)
     @Authorization(`${rolePrefix}:delete@auth`)
     @ApiParam({
-      type: [deleteParamValidator],
+      type: deleteParamValidator,
       name: 'id',
       example: '1def564a-42d9-4a94-9bf8-c9c6e4d796a6',
       description: 'ID!',
@@ -254,7 +254,7 @@ export function ControllerFactory<
     @HttpCode(HttpStatus.CREATED)
     @Authentication(true)
     @Authorization(`${rolePrefix}:delete@auth`)
-    @ApiBody({ type: [deleteBatchBodyValidator] })
+    @ApiBody({ type: deleteBatchBodyValidator })
     public async deleteBatch(
       @Context() ctx: IContext,
       @Body() body: DeleteBatchBody,
