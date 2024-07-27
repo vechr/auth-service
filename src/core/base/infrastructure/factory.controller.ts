@@ -26,6 +26,11 @@ import SuccessResponse from '../frameworks/shared/responses/success.response';
 import UseList from '../frameworks/shared/decorators/uselist.decorator';
 import { ApiFilterQuery } from '../frameworks/shared/decorators/api-filter-query.decorator';
 import Serializer from '../frameworks/shared/decorators/serializer.decorator';
+import {
+  FilterPaginationAuditQueryValidator,
+  ListAuditSerializer,
+  ListPaginationAuditQueryValidator,
+} from '../domain/entities/audit.entity';
 
 /**
  * ## Factory Controller Generator
@@ -82,6 +87,47 @@ export function ControllerFactory<
 ) {
   class BaseController {
     public _usecase: BaseUseCase;
+
+    @Get('audit/:id')
+    @ApiBearerAuth('access-token')
+    @ApiOperation({
+      summary: 'Get audit details by id',
+    })
+    @HttpCode(HttpStatus.OK)
+    @Serializer(getSerializer)
+    @Authentication(true)
+    @Authorization(`audit:read@auth`)
+    @ApiParam({
+      name: 'id',
+      example: '05fcdf7e-d39c-40d7-aae8-c7bd27088428',
+      description: 'ID!',
+    })
+    public async getAudit(@Param('id') id: string) {
+      const result = await this._usecase.getAudit(id);
+
+      return new SuccessResponse(
+        `audit of ${name} fetched successfully`,
+        result,
+      );
+    }
+
+    @Get('audit')
+    @ApiBearerAuth('access-token')
+    @ApiOperation({
+      summary:
+        'List of audits, you can get list of audit using page next or previous',
+    })
+    @HttpCode(HttpStatus.OK)
+    @UseList(FilterPaginationAuditQueryValidator)
+    @Serializer(ListAuditSerializer)
+    @ApiFilterQuery('filters', ListPaginationAuditQueryValidator)
+    @Authentication(true)
+    @Authorization(`audit:read@auth`)
+    public async getAudits(@Context() ctx: IContext) {
+      const { result, meta } = await this._usecase.getAudits(ctx);
+
+      return new SuccessResponse(`${name} fetched successfully`, result, meta);
+    }
 
     @Get('')
     @ApiBearerAuth('access-token')

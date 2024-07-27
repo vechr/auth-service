@@ -7,6 +7,8 @@ import {
 } from '../domain/entities';
 import { camelize } from '../frameworks/shared/utils/string.util';
 import { DeleteHelper, ReadHelper, WriteHelper } from './helpers';
+import { Prisma } from '@prisma/client';
+import { Audit, AuditList } from '../domain/entities/audit.entity';
 
 /**
  * ## BaseRepository
@@ -22,6 +24,8 @@ import { DeleteHelper, ReadHelper, WriteHelper } from './helpers';
  * - getMany
  * - listCursor
  * - listPagination
+ * - getAudits
+ * - getAudit
  */
 export abstract class BaseRepository<
   Entity extends Record<string, any>,
@@ -52,6 +56,8 @@ export abstract class BaseRepository<
   }
 
   async upsert(
+    isAudited: boolean,
+    ctx: IContext,
     name: string,
     tx: TPrismaTx,
     create: Create,
@@ -68,6 +74,8 @@ export abstract class BaseRepository<
       Select,
       Where
     >(
+      isAudited,
+      ctx,
       name,
       tx,
       this._entity,
@@ -80,12 +88,16 @@ export abstract class BaseRepository<
   }
 
   async create(
+    isAudited: boolean,
+    ctx: IContext,
     body: Create,
     tx: TPrismaTx,
     include?: Include,
     select?: Select,
   ): Promise<Entity> {
     return WriteHelper.create<Entity, Create, Include, Select>(
+      isAudited,
+      ctx,
       body,
       tx,
       this._entity,
@@ -95,11 +107,13 @@ export abstract class BaseRepository<
     );
   }
 
-  async createMany(body: any, tx: TPrismaTx): Promise<Entity[]> {
-    return WriteHelper.createMany<Entity, CreateMany>(body, tx, this._entity);
+  async createMany(body: any, tx: TPrismaTx): Promise<Prisma.BatchPayload> {
+    return WriteHelper.createMany<CreateMany>(body, tx, this._entity);
   }
 
   async update(
+    isAudited: boolean,
+    ctx: IContext,
     id: string,
     body: Update,
     tx: TPrismaTx,
@@ -108,6 +122,8 @@ export abstract class BaseRepository<
     where?: Where,
   ): Promise<Entity> {
     return WriteHelper.update<Entity, Update, Include, Select, Where>(
+      isAudited,
+      ctx,
       id,
       body,
       tx,
@@ -120,6 +136,8 @@ export abstract class BaseRepository<
   }
 
   async delete(
+    isAudited: boolean,
+    ctx: IContext,
     id: string,
     tx: TPrismaTx,
     include?: Include,
@@ -127,6 +145,8 @@ export abstract class BaseRepository<
     where?: Where,
   ): Promise<Entity> {
     return DeleteHelper.delete<Entity, Include, Select, Where>(
+      isAudited,
+      ctx,
       id,
       tx,
       this._entity,
@@ -141,7 +161,7 @@ export abstract class BaseRepository<
     ids: string[],
     tx: TPrismaTx,
     where?: Where,
-  ): Promise<{ count: number }> {
+  ): Promise<Prisma.BatchPayload> {
     return DeleteHelper.deleteBatch(
       ids,
       tx,
@@ -223,5 +243,38 @@ export abstract class BaseRepository<
       this._entity,
       where ? where : this.defaultWhere,
     );
+  }
+
+  async getAudits(
+    ctx: IContext,
+    tx: TPrismaTx,
+  ): Promise<IListPaginationResult<AuditList>> {
+    return ReadHelper.listPaginationWithInclude<
+      AuditList,
+      Prisma.AuditWhereInput | Prisma.AuditWhereUniqueInput,
+      Prisma.AuditSelect
+    >(
+      ctx,
+      tx,
+      'audit',
+      {
+        auditable: this._entity,
+      },
+      {
+        id: true,
+        changeCount: true,
+        action: true,
+        username: true,
+        createdAt: true,
+      },
+    );
+  }
+
+  async getAudit(tx: TPrismaTx, id: string): Promise<Audit | null> {
+    return await tx.audit.findUnique({
+      where: {
+        id,
+      },
+    });
   }
 }

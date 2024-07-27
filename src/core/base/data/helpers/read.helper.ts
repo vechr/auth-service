@@ -150,6 +150,58 @@ export class ReadHelper {
     };
   }
 
+  static async listPaginationWithInclude<
+    Entity extends Record<string, any>,
+    Where extends Record<string, any>,
+    Select extends Record<string, any>,
+  >(
+    ctx: IContext,
+    tx: TPrismaTx,
+    entity: string,
+    where?: Where,
+    select?: Select,
+  ): Promise<IListPaginationResult<Entity>> {
+    const query = ctx.params.query as any;
+
+    const { limit, offset, order, page } = parsePaginationQuery<any>(query);
+
+    const selectOptions = {
+      orderBy: order,
+      where: {
+        ...query.filters.field,
+        ...where,
+      },
+    };
+
+    const pageOptions = {
+      take: limit,
+      skip: offset,
+    };
+
+    const selectField = {
+      select,
+    };
+
+    const queryData = await ReadHelper.queryData<Entity>(
+      selectOptions,
+      { ...selectOptions, ...selectField, ...pageOptions },
+      tx,
+      entity,
+    );
+
+    const meta = parsePaginationMeta<Entity>({
+      result: queryData.data,
+      total: queryData.total,
+      page,
+      limit,
+    });
+
+    return {
+      result: queryData.data,
+      meta,
+    };
+  }
+
   static async listCursor<
     Entity extends Record<string, any>,
     Include extends Record<string, any>,

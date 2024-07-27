@@ -25,7 +25,6 @@ import {
 } from '@/core/base/frameworks/shared/exceptions/common.exception';
 import { Prisma } from '@prisma/client';
 import PrismaService from '@/core/base/frameworks/data-services/prisma/prisma.service';
-import AuditUseCase from '@/core/modules/audits/domain/usecase/audit.usecase';
 import { IContext } from '@/core/base/frameworks/shared/interceptors/context.interceptor';
 
 @Injectable()
@@ -40,7 +39,6 @@ export class UserUseCase extends BaseUseCase<
 > {
   constructor(
     protected repository: UserRepository,
-    protected auditUseCase: AuditUseCase,
     db: PrismaService,
   ) {
     super(repository, db);
@@ -87,7 +85,14 @@ export class UserUseCase extends BaseUseCase<
           },
         };
 
-        return await this.repository.upsert(body.name, tx, create, update);
+        return await this.repository.upsert(
+          true,
+          ctx,
+          body.name,
+          tx,
+          create,
+          update,
+        );
       });
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -145,7 +150,7 @@ export class UserUseCase extends BaseUseCase<
           },
         };
 
-        return await this.repository.create(bodyModified, tx);
+        return await this.repository.create(true, ctx, bodyModified, tx);
       });
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -204,7 +209,13 @@ export class UserUseCase extends BaseUseCase<
           },
         };
 
-        return await this.repository.update(params.id, bodyModified, tx);
+        return await this.repository.update(
+          true,
+          ctx,
+          params.id,
+          bodyModified,
+          tx,
+        );
       });
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -274,7 +285,7 @@ export class UserUseCase extends BaseUseCase<
     try {
       return await this.db.$transaction(async (tx) => {
         await this.repository.getById(params.id, tx);
-        return await this.repository.delete(params.id, tx);
+        return await this.repository.delete(true, ctx, params.id, tx);
       });
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError) {

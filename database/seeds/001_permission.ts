@@ -17,6 +17,17 @@ const permissions: TPermissionSeed = [
       description: 'full access to the whole system',
     },
   },
+  // audit
+  {
+    where: { alias: 'audit:read@auth' },
+    update: {},
+    create: {
+      id: '4f189165-d56d-4f71-a087-03f8838b5059',
+      alias: 'audit:read@auth',
+      name: 'read audit',
+      description: 'access to read audit',
+    },
+  },
   // users module
   {
     where: { alias: 'users:create@auth' },

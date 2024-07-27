@@ -11,6 +11,29 @@ datasource db {
   url      = env("DB_URL")
 }
 
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+model Audit {
+  id          String      @id @default(uuid()) @db.VarChar(36)
+  auditable   String      @db.VarChar(30)
+  auditableId String      @db.VarChar(36)
+  changeCount Int         @default(0)
+  previous    Json?
+  incoming    Json?
+  action      AuditAction
+  username    String?     @db.VarChar(50)
+  userId      String      @db.VarChar(36)
+  createdAt     DateTime    @default(now())
+
+  @@index([auditable, auditableId])
+  @@index([userId])
+  @@map("Audit")
+}
+
 model Site {
   id          String   @id @default(uuid()) @db.VarChar(36)
   code        String   @unique @db.VarChar(15)

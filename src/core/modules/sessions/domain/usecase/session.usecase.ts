@@ -230,6 +230,8 @@ export class SessionUseCase extends BaseUseCase<
 
         // Store session data into database!
         const session = await this.repository.create(
+          false,
+          ctx,
           {
             data: { user: instanceToPlain(customUser), headers },
             user: {

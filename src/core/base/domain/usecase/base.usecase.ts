@@ -11,8 +11,10 @@ import {
   IListCursorResult,
   IListPaginationResult,
 } from '../entities';
-import { BaseRepository } from '../../data/base.repository';
 import PrismaService from '../../frameworks/data-services/prisma/prisma.service';
+import { BaseRepository } from '../../data/base.repository';
+import { Prisma } from '@prisma/client';
+import { Audit, AuditList } from '../entities/audit.entity';
 
 /**
  * ## BaseUsecase
@@ -75,7 +77,7 @@ export abstract class BaseUseCase<
   @OtelMethodCounter()
   @Span('usecase upsert')
   async upsert(
-    _ctx: IContext,
+    ctx: IContext,
     body: any,
     include?: Include,
     select?: Select,
@@ -87,6 +89,8 @@ export abstract class BaseUseCase<
 
       const data = await this.db.$transaction(async (tx) => {
         return await this.repository.upsert(
+          true,
+          ctx,
           body.name,
           tx,
           create,
@@ -113,10 +117,10 @@ export abstract class BaseUseCase<
 
   @OtelMethodCounter()
   @Span('usecase create')
-  async create(_ctx: IContext, body: any, include?: Include): Promise<Entity> {
+  async create(ctx: IContext, body: any, include?: Include): Promise<Entity> {
     try {
       const data = await this.db.$transaction(async (tx) => {
-        return await this.repository.create(body, tx, include);
+        return await this.repository.create(true, ctx, body, tx, include);
       });
 
       return data;
@@ -162,13 +166,13 @@ export abstract class BaseUseCase<
   @OtelMethodCounter()
   @Span('usecase update')
   async update(
-    _ctx: IContext,
+    ctx: IContext,
     params: { id: string },
     body: any,
   ): Promise<Entity> {
     try {
       const data = await this.db.$transaction(async (tx) => {
-        return await this.repository.update(params.id, body, tx);
+        return await this.repository.update(true, ctx, params.id, body, tx);
       });
 
       return data;
@@ -190,7 +194,7 @@ export abstract class BaseUseCase<
   async deleteBatch(
     _ctx: IContext,
     body: { ids: string[] },
-  ): Promise<{ count: number }> {
+  ): Promise<Prisma.BatchPayload> {
     try {
       return await this.db.$transaction(async (tx) => {
         return await this.repository.deleteBatch(body.ids, tx);
@@ -211,7 +215,7 @@ export abstract class BaseUseCase<
   @OtelMethodCounter()
   @Span('usecase delete')
   async delete(
-    _ctx: IContext,
+    ctx: IContext,
     params: { id: string },
     include?: Include,
     select?: Select,
@@ -221,6 +225,8 @@ export abstract class BaseUseCase<
       return await this.db.$transaction(async (tx) => {
         await this.repository.getById(params.id, tx);
         return await this.repository.delete(
+          true,
+          ctx,
           params.id,
           tx,
           include,
@@ -274,6 +280,42 @@ export abstract class BaseUseCase<
     try {
       return await this.db.$transaction(async (tx) => {
         return this.repository.listCursor(ctx, tx, include, where);
+      });
+    } catch (error: any) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        log.error(error.message);
+        throw new UnknownException({
+          code: EErrorCommonCode.INTERNAL_SERVER_ERROR,
+          message: `Error unexpected during retrieve a list!`,
+          params: { exception: error.message },
+        });
+      }
+      throw error;
+    }
+  }
+
+  async getAudits(ctx: IContext): Promise<IListPaginationResult<AuditList>> {
+    try {
+      return await this.db.$transaction(async (tx) => {
+        return this.repository.getAudits(ctx, tx);
+      });
+    } catch (error: any) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        log.error(error.message);
+        throw new UnknownException({
+          code: EErrorCommonCode.INTERNAL_SERVER_ERROR,
+          message: `Error unexpected during retrieve a list!`,
+          params: { exception: error.message },
+        });
+      }
+      throw error;
+    }
+  }
+
+  async getAudit(id: string): Promise<Audit | null> {
+    try {
+      return await this.db.$transaction(async (tx) => {
+        return this.repository.getAudit(tx, id);
       });
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError) {

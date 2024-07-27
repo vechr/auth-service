@@ -39,7 +39,7 @@ export class RoleUseCase extends BaseUseCase<
   @OtelMethodCounter()
   @Span('usecase create role')
   override async upsert(
-    _ctx: IContext,
+    ctx: IContext,
     body: TUpsertRoleRequestBody,
   ): Promise<Role> {
     try {
@@ -65,7 +65,14 @@ export class RoleUseCase extends BaseUseCase<
           },
         };
 
-        return await this.repository.upsert(body.name, tx, create, update);
+        return await this.repository.upsert(
+          true,
+          ctx,
+          body.name,
+          tx,
+          create,
+          update,
+        );
       });
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -88,7 +95,7 @@ export class RoleUseCase extends BaseUseCase<
   @OtelMethodCounter()
   @Span('usecase create role')
   override async create(
-    _ctx: IContext,
+    ctx: IContext,
     body: TCreateRoleRequestBody,
   ): Promise<Role> {
     try {
@@ -103,7 +110,7 @@ export class RoleUseCase extends BaseUseCase<
           },
         };
 
-        return await this.repository.create(bodyModified, tx);
+        return await this.repository.create(true, ctx, bodyModified, tx);
       });
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -127,7 +134,7 @@ export class RoleUseCase extends BaseUseCase<
   @OtelMethodCounter()
   @Span('usecase update role')
   override async update(
-    _ctx: IContext,
+    ctx: IContext,
     params: TUpdateRoleByIdRequestParams,
     body: TUpdateRoleRequestBody,
   ): Promise<Role> {
@@ -146,7 +153,13 @@ export class RoleUseCase extends BaseUseCase<
           },
         };
 
-        return await this.repository.update(params.id, bodyModified, tx);
+        return await this.repository.update(
+          true,
+          ctx,
+          params.id,
+          bodyModified,
+          tx,
+        );
       });
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError) {

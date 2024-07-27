@@ -1,6 +1,8 @@
 import { Cache } from 'cache-manager';
 import { TPrismaTx } from '../../domain/entities';
 import { ReadHelper } from './read.helper';
+import { AuditAction, Prisma } from '@prisma/client';
+import { IContext } from '../../frameworks/shared/interceptors/context.interceptor';
 
 export class WriteHelper {
   static async create<
@@ -9,6 +11,8 @@ export class WriteHelper {
     Include extends Record<string, any>,
     Select extends Record<string, any>,
   >(
+    isAudited: boolean,
+    ctx: IContext,
     body: Create,
     tx: TPrismaTx,
     entity: string,
@@ -22,6 +26,21 @@ export class WriteHelper {
       select,
     });
 
+    // create audit object
+    if (isAudited) {
+      await tx.audit.create({
+        data: {
+          auditable: entity,
+          auditableId: data.id,
+          previous: {},
+          incoming: data,
+          action: AuditAction.CREATE,
+          username: ctx.user.name,
+          userId: ctx.user.id,
+        },
+      });
+    }
+
     if (data) {
       await cacheManager.set(data.id, data);
     }
@@ -29,10 +48,18 @@ export class WriteHelper {
     return data;
   }
 
-  static async createMany<
-    Entity extends Record<string, any>,
-    CreateMany extends Record<string, any>,
-  >(body: CreateMany, tx: TPrismaTx, entity: string): Promise<Entity[]> {
+  /**
+   * Create many doesn't have auditable so it's not recommended to use this!
+   * @param body CreateMany
+   * @param tx TxPrismaTx
+   * @param entity string
+   * @returns Prisma.BatchPayload
+   */
+  static async createMany<CreateMany extends Record<string, any>>(
+    body: CreateMany,
+    tx: TPrismaTx,
+    entity: string,
+  ): Promise<Prisma.BatchPayload> {
     const data = await tx[entity].createMany({
       data: body,
     });
@@ -48,6 +75,8 @@ export class WriteHelper {
     Select extends Record<string, any>,
     Where extends Record<string, any>,
   >(
+    isAudited: boolean,
+    ctx: IContext,
     name: string,
     tx: TPrismaTx,
     entity: string,
@@ -57,7 +86,18 @@ export class WriteHelper {
     select?: Select,
     where?: Where,
   ): Promise<Entity> {
-    const upsert = await tx[entity].upsert({
+    // Check if existing are exists!
+    const existingObj = await ReadHelper.get<Entity, Include, Select, any>(
+      tx,
+      entity,
+      include,
+      select,
+      {
+        name,
+      },
+    );
+
+    const data = await tx[entity].upsert({
       where: {
         name,
         ...where,
@@ -68,7 +108,33 @@ export class WriteHelper {
       select,
     });
 
-    return upsert;
+    // create audit object
+    if (isAudited) {
+      const lastAudited = await tx.audit.findFirst({
+        where: {
+          auditable: entity,
+          auditableId: existingObj ? existingObj.id : '',
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+
+      await tx.audit.create({
+        data: {
+          auditable: entity,
+          auditableId: data.id,
+          changeCount: lastAudited ? lastAudited.changeCount + 1 : 0,
+          previous: existingObj ? existingObj : {},
+          incoming: data,
+          action: existingObj ? AuditAction.UPDATE : AuditAction.CREATE,
+          username: ctx.user.name,
+          userId: ctx.user.id,
+        },
+      });
+    }
+
+    return data;
   }
 
   static async update<
@@ -78,6 +144,8 @@ export class WriteHelper {
     Select extends Record<string, any>,
     Where extends Record<string, any>,
   >(
+    isAudited: boolean,
+    ctx: IContext,
     id: string,
     body: Update,
     tx: TPrismaTx,
@@ -87,7 +155,14 @@ export class WriteHelper {
     select?: Select,
     where?: Where,
   ): Promise<Entity> {
-    await ReadHelper.getById(id, tx, entity, cacheManager);
+    const existingObj = await ReadHelper.getById<Entity, Include, Select>(
+      id,
+      tx,
+      entity,
+      cacheManager,
+      include,
+      select,
+    );
 
     const data = await tx[entity].update({
       where: { id, ...where },
@@ -95,6 +170,32 @@ export class WriteHelper {
       include,
       select,
     });
+
+    // create audit object
+    if (isAudited) {
+      const lastAudited = await tx.audit.findFirst({
+        where: {
+          auditable: entity,
+          auditableId: existingObj ? existingObj.id : '',
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+
+      await tx.audit.create({
+        data: {
+          auditable: entity,
+          auditableId: data.id,
+          changeCount: lastAudited ? lastAudited?.changeCount + 1 : 0,
+          previous: existingObj,
+          incoming: data,
+          action: AuditAction.UPDATE,
+          username: ctx.user.name,
+          userId: ctx.user.id,
+        },
+      });
+    }
 
     if (data) {
       await cacheManager.set(data.id, data);
