@@ -1,4 +1,4 @@
-import glob from 'glob';
+import { glob } from 'glob';
 import { PrismaClient } from '@prisma/client';
 import winston, { transports } from 'winston';
 import { utilities } from 'nest-winston';

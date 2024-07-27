@@ -1,5 +1,5 @@
-import glob from 'glob';
 import { PrismaClient } from '@prisma/client';
+import { glob } from 'glob';
 import { utilities, WinstonModuleOptions } from 'nest-winston';
 import winston, { transports } from 'winston';
 

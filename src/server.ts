@@ -1,8 +1,4 @@
-// Start the Open telemetry
 import otelSDK from './tracing';
-otelSDK.start();
-
-// Start the application
 import { join } from 'path';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
@@ -78,7 +74,7 @@ const appServer = new Promise(async (resolve, reject) => {
 
     // Versioning of default URL V1
     app.enableVersioning({
-      defaultVersion: '1',
+      defaultVersion: '1/auth',
       type: VersioningType.URI,
     });
 
@@ -122,6 +118,9 @@ const appServer = new Promise(async (resolve, reject) => {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('/api/auth', app, document, option);
 
+    // Ignore Favicon
+    app.use(ignoreFavicon);
+
     const port = process.env.PORT ?? appConfig.APP_PORT;
 
     // express-winston logger makes sense BEFORE the router
@@ -145,5 +144,13 @@ const appServer = new Promise(async (resolve, reject) => {
 });
 
 (async function () {
+  if (appConfig.OTLP_HTTP_URL && appConfig.OTLP_HTTP_URL != '') otelSDK.start();
   await Promise.all([appServer]);
 })();
+
+function ignoreFavicon(req: any, res: any, next: any) {
+  if (req.originalUrl.includes('favicon.ico')) {
+    res.status(204).end();
+  }
+  next();
+}
