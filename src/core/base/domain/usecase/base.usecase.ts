@@ -141,12 +141,12 @@ export abstract class BaseUseCase<
   @Span('usecase get')
   async getById(
     _ctx: IContext,
-    params: { id: string },
+    id: string,
     include?: Include,
   ): Promise<Entity> {
     try {
       const data = await this.db.$transaction(async (tx) => {
-        return await this.repository.getById(params.id, tx, include);
+        return await this.repository.getById(id, tx, include);
       });
 
       return data;
@@ -165,14 +165,10 @@ export abstract class BaseUseCase<
 
   @OtelMethodCounter()
   @Span('usecase update')
-  async update(
-    ctx: IContext,
-    params: { id: string },
-    body: any,
-  ): Promise<Entity> {
+  async update(ctx: IContext, id: string, body: any): Promise<Entity> {
     try {
       const data = await this.db.$transaction(async (tx) => {
-        return await this.repository.update(true, ctx, params.id, body, tx);
+        return await this.repository.update(true, ctx, id, body, tx);
       });
 
       return data;
@@ -216,18 +212,18 @@ export abstract class BaseUseCase<
   @Span('usecase delete')
   async delete(
     ctx: IContext,
-    params: { id: string },
+    id: string,
     include?: Include,
     select?: Select,
     where?: Where,
   ): Promise<Entity> {
     try {
       return await this.db.$transaction(async (tx) => {
-        await this.repository.getById(params.id, tx);
+        await this.repository.getById(id, tx);
         return await this.repository.delete(
           true,
           ctx,
-          params.id,
+          id,
           tx,
           include,
           select,

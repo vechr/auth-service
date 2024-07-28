@@ -59,11 +59,8 @@ import {
 export function ControllerFactory<
   UpsertBody,
   CreateBody,
-  GetParams extends { id: string },
   UpdateBody,
-  UpdateParams extends { id: string },
   DeleteBatchBody extends { ids: string[] },
-  DeleteParams extends { id: string },
 >(
   name: string,
   rolePrefix: string,
@@ -77,13 +74,10 @@ export function ControllerFactory<
   createSerializer: Type,
   createBodyValidator: Type,
   getSerializer: Type,
-  getParamValidator: Type,
   updateSerializer: Type,
   updateBodyValidator: Type,
-  updateParamValidator: Type,
   deleteSerializer: Type,
   deleteBatchBodyValidator: Type,
-  deleteParamValidator: Type,
 ) {
   class BaseController {
     public _usecase: BaseUseCase;
@@ -230,13 +224,12 @@ export function ControllerFactory<
     @Authentication(true)
     @Authorization(`${rolePrefix}:read@auth`)
     @ApiParam({
-      type: getParamValidator,
       name: 'id',
       example: '1def564a-42d9-4a94-9bf8-c9c6e4d796a6',
       description: 'ID!',
     })
-    public async get(@Context() ctx: IContext, @Param() params: GetParams) {
-      const result = await this._usecase.getById(ctx, params);
+    public async get(@Context() ctx: IContext, @Param('id') id: string) {
+      const result = await this._usecase.getById(ctx, id);
 
       return new SuccessResponse(`${name} fetched successfully`, result);
     }
@@ -252,17 +245,16 @@ export function ControllerFactory<
     @Authorization(`${rolePrefix}:update@auth`)
     @ApiBody({ type: updateBodyValidator })
     @ApiParam({
-      type: updateParamValidator,
       name: 'id',
       example: '1def564a-42d9-4a94-9bf8-c9c6e4d796a6',
       description: 'ID!',
     })
     public async update(
       @Context() ctx: IContext,
-      @Param() params: UpdateParams,
+      @Param('id') id: string,
       @Body() body: UpdateBody,
     ): Promise<SuccessResponse> {
-      const result = await this._usecase.update(ctx, params, body);
+      const result = await this._usecase.update(ctx, id, body);
 
       return new SuccessResponse(`${name} updated successfully`, result);
     }
@@ -277,16 +269,15 @@ export function ControllerFactory<
     @Authentication(true)
     @Authorization(`${rolePrefix}:delete@auth`)
     @ApiParam({
-      type: deleteParamValidator,
       name: 'id',
       example: '1def564a-42d9-4a94-9bf8-c9c6e4d796a6',
       description: 'ID!',
     })
     public async delete(
       @Context() ctx: IContext,
-      @Param() params: DeleteParams,
+      @Param('id') id: string,
     ): Promise<SuccessResponse> {
-      const result = await this._usecase.delete(ctx, params);
+      const result = await this._usecase.delete(ctx, id);
 
       return new SuccessResponse(`${name} deleted successfully`, result);
     }

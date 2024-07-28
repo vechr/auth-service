@@ -14,9 +14,6 @@ export type TListSiteRequestQuery<P> = IListRequestQuery<
   Site,
   Prisma.SiteWhereInput
 >;
-export type TGetSiteByIdRequestParams = Pick<Site, 'id'>;
-export type TUpdateSiteByIdRequestParams = Pick<Site, 'id'>;
-export type TDeleteSiteByIdRequestParams = Pick<Site, 'id'>;
 export type TCreateSiteRequestBody = Omit<
   Site,
   'id' | 'createdAt' | 'updatedAt'

@@ -4,10 +4,7 @@ import { Role, Prisma } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   TCreateRoleRequestBody,
-  TDeleteRoleByIdRequestParams,
-  TGetRoleByIdRequestParams,
   TListRoleRequestQuery,
-  TUpdateRoleByIdRequestParams,
   TUpdateRoleRequestBody,
   TUpsertRoleRequestBody,
 } from './role.entity';
@@ -20,7 +17,6 @@ import {
 } from '@/core/base/domain/entities';
 import {
   CreateValidator,
-  IDValidator,
   IDsValidator,
   UpdateValidator,
 } from '@/core/base/domain/entities/validator.entity';
@@ -87,18 +83,6 @@ export class CreateRoleValidator
 export class UpsertRoleValidator
   extends CreateRoleValidator
   implements TUpsertRoleRequestBody {}
-
-export class UpdateRoleParamsValidator
-  extends IDValidator
-  implements TUpdateRoleByIdRequestParams {}
-
-export class GetRoleParamsValidator
-  extends IDValidator
-  implements TGetRoleByIdRequestParams {}
-
-export class DeleteRoleParamsValidator
-  extends IDValidator
-  implements TDeleteRoleByIdRequestParams {}
 
 export class DeleteRoleBatchBodyValidator extends IDsValidator {}
 

@@ -12,13 +12,10 @@ import {
 import {
   CreateRoleValidator,
   DeleteRoleBatchBodyValidator,
-  DeleteRoleParamsValidator,
   FilterCursorRoleQueryValidator,
   FilterPaginationRoleQueryValidator,
-  GetRoleParamsValidator,
   ListCursorRoleQueryValidator,
   ListPaginationRoleQueryValidator,
-  UpdateRoleParamsValidator,
   UpdateRoleValidator,
   UpsertRoleValidator,
 } from '@/modules/roles/domain/entities/role.validator';
@@ -31,11 +28,8 @@ import { OtelInstanceCounter } from 'nestjs-otel';
 export class RoleController extends ControllerFactory<
   UpsertRoleValidator,
   CreateRoleValidator,
-  GetRoleParamsValidator,
   UpdateRoleValidator,
-  UpdateRoleParamsValidator,
-  DeleteRoleBatchBodyValidator,
-  DeleteRoleParamsValidator
+  DeleteRoleBatchBodyValidator
 >(
   'role',
   'role',
@@ -49,13 +43,10 @@ export class RoleController extends ControllerFactory<
   CreateRoleSerializer,
   CreateRoleValidator,
   GetRoleSerializer,
-  GetRoleParamsValidator,
   UpdateRoleSerializer,
   UpdateRoleValidator,
-  UpdateRoleParamsValidator,
   DeleteRoleSerializer,
   DeleteRoleBatchBodyValidator,
-  DeleteRoleParamsValidator,
 ) {
   constructor(public _usecase: RoleUseCase) {
     super();

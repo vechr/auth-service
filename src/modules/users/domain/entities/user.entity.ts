@@ -23,9 +23,6 @@ export type TListUserRequestQuery<P> = IListRequestQuery<
   User,
   Prisma.UserWhereInput
 >;
-export type TGetUserByIdRequestParams = Pick<User, 'id'>;
-export type TUpdateUserByIdRequestParams = Pick<User, 'id'>;
-export type TDeleteUserByIdRequestParams = Pick<User, 'id'>;
 export type TCreateUser = Omit<User, 'id' | 'createdAt' | 'updatedAt'>;
 export type TCreateUserRequestBody = TCreateUser & {
   confirmPassword: string;

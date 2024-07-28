@@ -5,7 +5,6 @@ import { BaseUseCase } from '../../../../core/base/domain/usecase/base.usecase';
 import { RoleRepository } from '../../data/role.repository';
 import {
   TCreateRoleRequestBody,
-  TUpdateRoleByIdRequestParams,
   TUpdateRoleRequestBody,
   TUpsertRoleRequestBody,
   Role,
@@ -135,12 +134,12 @@ export class RoleUseCase extends BaseUseCase<
   @Span('usecase update role')
   override async update(
     ctx: IContext,
-    params: TUpdateRoleByIdRequestParams,
+    id: string,
     body: TUpdateRoleRequestBody,
   ): Promise<Role> {
     try {
       return await this.db.$transaction(async (tx) => {
-        await this.repository.getById(params.id, tx);
+        await this.repository.getById(id, tx);
 
         const bodyModified: Prisma.RoleUpdateInput = {
           description: body.description,
@@ -153,13 +152,7 @@ export class RoleUseCase extends BaseUseCase<
           },
         };
 
-        return await this.repository.update(
-          true,
-          ctx,
-          params.id,
-          bodyModified,
-          tx,
-        );
+        return await this.repository.update(true, ctx, id, bodyModified, tx);
       });
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError) {

@@ -15,7 +15,6 @@ import Serializer from '@/core/base/frameworks/shared/decorators/serializer.deco
 import {
   FilterCursorPermissionQueryValidator,
   FilterPaginationPermissionQueryValidator,
-  GetPermissionParamsValidator,
   ListCursorPermissionQueryValidator,
   ListPaginationPermissionQueryValidator,
 } from '@/modules/permissions/domain/entities/permission.validator';
@@ -109,11 +108,8 @@ export class PermissionController {
   @Serializer(GetPermissionSerializer)
   @Authentication(true)
   @Authorization('permission:read@auth')
-  public async get(
-    @Context() ctx: IContext,
-    @Param() params: GetPermissionParamsValidator,
-  ) {
-    const result = await this._usecase.getById(ctx, params);
+  public async get(@Context() ctx: IContext, @Param('id') id: string) {
+    const result = await this._usecase.getById(ctx, id);
 
     return new SuccessResponse('permission fetched successfully', result);
   }

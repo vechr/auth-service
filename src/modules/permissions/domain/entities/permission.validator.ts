@@ -2,10 +2,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsObject, IsOptional, ValidateNested } from 'class-validator';
 import { Permission, Prisma } from '@prisma/client';
 import { Expose, Type } from 'class-transformer';
-import {
-  TGetPermissionByIdRequestParams,
-  TListPermissionRequestQuery,
-} from './permission.entity';
+import { TListPermissionRequestQuery } from './permission.entity';
 import {
   BaseCursorQueryValidator,
   BasePaginationQueryValidator,
@@ -14,7 +11,6 @@ import {
   ListQueryField,
   StringFilterQuery,
 } from '@/core/base/domain/entities';
-import { IDValidator } from '@/core/base/domain/entities/validator.entity';
 
 // For field filter in list whether cursor or pagination
 export class ListPermissionQueryField
@@ -70,7 +66,3 @@ export class FilterPaginationPermissionQueryValidator
   @Type(() => ListPaginationPermissionQueryValidator)
   filters: ListPaginationPermissionQueryValidator;
 }
-
-export class GetPermissionParamsValidator
-  extends IDValidator
-  implements TGetPermissionByIdRequestParams {}

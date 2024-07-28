@@ -12,13 +12,10 @@ import {
 import {
   CreateSiteValidator,
   DeleteSiteBatchBodyValidator,
-  DeleteSiteParamsValidator,
   FilterCursorSiteQueryValidator,
   FilterPaginationSiteQueryValidator,
-  GetSiteParamsValidator,
   ListCursorSiteQueryValidator,
   ListPaginationSiteQueryValidator,
-  UpdateSiteParamsValidator,
   UpdateSiteValidator,
   UpsertSiteValidator,
 } from '@/modules/sites/domain/entities/site.validator';
@@ -31,11 +28,8 @@ import { OtelInstanceCounter } from 'nestjs-otel';
 export class SiteController extends ControllerFactory<
   UpsertSiteValidator,
   CreateSiteValidator,
-  GetSiteParamsValidator,
   UpdateSiteValidator,
-  UpdateSiteParamsValidator,
-  DeleteSiteBatchBodyValidator,
-  DeleteSiteParamsValidator
+  DeleteSiteBatchBodyValidator
 >(
   'site',
   'site',
@@ -49,13 +43,10 @@ export class SiteController extends ControllerFactory<
   CreateSiteSerializer,
   CreateSiteValidator,
   GetSiteSerializer,
-  GetSiteParamsValidator,
   UpdateSiteSerializer,
   UpdateSiteValidator,
-  UpdateSiteParamsValidator,
   DeleteSiteSerializer,
   DeleteSiteBatchBodyValidator,
-  DeleteSiteParamsValidator,
 ) {
   constructor(public _usecase: SiteUseCase) {
     super();

@@ -21,13 +21,10 @@ import Serializer from '@/core/base/frameworks/shared/decorators/serializer.deco
 import {
   CreateUserValidator,
   DeleteUserBatchBodyValidator,
-  DeleteUserParamsValidator,
   FilterCursorUserQueryValidator,
   FilterPaginationUserQueryValidator,
-  GetUserParamsValidator,
   ListCursorUserQueryValidator,
   ListPaginationUserQueryValidator,
-  UpdateUserParamsValidator,
   UpdateUserValidator,
   UpsertUserValidator,
 } from '@/modules/users/domain/entities/user.validator';
@@ -48,11 +45,8 @@ import { IContext } from '@/core/base/frameworks/shared/interceptors/context.int
 export class UserController extends ControllerFactory<
   UpsertUserValidator,
   CreateUserValidator,
-  GetUserParamsValidator,
   UpdateUserValidator,
-  UpdateUserParamsValidator,
-  DeleteUserBatchBodyValidator,
-  DeleteUserParamsValidator
+  DeleteUserBatchBodyValidator
 >(
   'user',
   'user',
@@ -66,13 +60,10 @@ export class UserController extends ControllerFactory<
   CreateUserSerializer,
   CreateUserValidator,
   GetUserSerializer,
-  GetUserParamsValidator,
   UpdateUserSerializer,
   UpdateUserValidator,
-  UpdateUserParamsValidator,
   DeleteUserSerializer,
   DeleteUserBatchBodyValidator,
-  DeleteUserParamsValidator,
 ) {
   constructor(public _usecase: UserUseCase) {
     super();
@@ -89,7 +80,7 @@ export class UserController extends ControllerFactory<
   @Authorization('users:delete@auth')
   public override async delete(
     @Context() ctx: IContext,
-    @Param() params: DeleteUserParamsValidator,
+    @Param('id') id: string,
   ): Promise<SuccessResponse> {
     if (ctx.user === undefined)
       throw new UnknownException({
@@ -98,7 +89,7 @@ export class UserController extends ControllerFactory<
         params: { exception: ctx.user },
       });
 
-    const result = await this._usecase.deleteWithCurrentUserCheck(ctx, params);
+    const result = await this._usecase.deleteWithCurrentUserCheck(ctx, id);
 
     return new SuccessResponse('user deleted successfully', result);
   }

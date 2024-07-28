@@ -11,9 +11,6 @@ export type TListRoleRequestQuery<P> = IListRequestQuery<
   Role,
   Prisma.RoleWhereInput
 >;
-export type TGetRoleByIdRequestParams = Pick<Role, 'id'>;
-export type TUpdateRoleByIdRequestParams = Pick<Role, 'id'>;
-export type TDeleteRoleByIdRequestParams = Pick<Role, 'id'>;
 export type TCreateRole = Omit<Role, 'id' | 'createdAt' | 'updatedAt'>;
 export type TCreateRoleRequestBody = TCreateRole & {
   permissions: string[];

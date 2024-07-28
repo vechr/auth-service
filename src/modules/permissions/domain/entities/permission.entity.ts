@@ -13,5 +13,3 @@ export type TListPermissionRequestQuery<P> = IListRequestQuery<
   Permission,
   Prisma.PermissionWhereInput
 >;
-export type TGetPermissionByIdRequestParams = Pick<Permission, 'id'>;
-export type TUpdatePermissionByIdRequestParams = Pick<Permission, 'id'>;

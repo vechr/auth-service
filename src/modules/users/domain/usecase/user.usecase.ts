@@ -5,8 +5,6 @@ import { BaseUseCase } from '../../../../core/base/domain/usecase/base.usecase';
 import { UserRepository } from '../../data/user.repository';
 import {
   TCreateUserRequestBody,
-  TDeleteUserByIdRequestParams,
-  TUpdateUserByIdRequestParams,
   TUpdateUserRequestBody,
   TUpsertUserRequestBody,
   User,
@@ -174,12 +172,12 @@ export class UserUseCase extends BaseUseCase<
   @Span('usecase update user')
   override async update(
     ctx: IContext,
-    params: TUpdateUserByIdRequestParams,
+    id: string,
     body: TUpdateUserRequestBody,
   ): Promise<User> {
     try {
       return await this.db.$transaction(async (tx) => {
-        await this.repository.getById(params.id, tx);
+        await this.repository.getById(id, tx);
 
         if (body.password !== body.confirmPassword) {
           throw new PasswordIsNotMatch({
@@ -209,13 +207,7 @@ export class UserUseCase extends BaseUseCase<
           },
         };
 
-        return await this.repository.update(
-          true,
-          ctx,
-          params.id,
-          bodyModified,
-          tx,
-        );
+        return await this.repository.update(true, ctx, id, bodyModified, tx);
       });
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -272,11 +264,8 @@ export class UserUseCase extends BaseUseCase<
    * @returns {Promise<User>}
    */
   @Span('usecase delete user')
-  async deleteWithCurrentUserCheck(
-    ctx: IContext,
-    params: TDeleteUserByIdRequestParams,
-  ): Promise<User> {
-    if (ctx.user.id === params.id) {
+  async deleteWithCurrentUserCheck(ctx: IContext, id: string): Promise<User> {
+    if (ctx.user.id === id) {
       throw new DeleteUnauthorized({
         username: ctx.user.name,
       });
@@ -284,8 +273,8 @@ export class UserUseCase extends BaseUseCase<
 
     try {
       return await this.db.$transaction(async (tx) => {
-        await this.repository.getById(params.id, tx);
-        return await this.repository.delete(true, ctx, params.id, tx);
+        await this.repository.getById(id, tx);
+        return await this.repository.delete(true, ctx, id, tx);
       });
     } catch (error: any) {
       if (error instanceof PrismaClientKnownRequestError) {

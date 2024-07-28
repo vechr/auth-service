@@ -10,10 +10,7 @@ import { Site, Prisma } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   TCreateSiteRequestBody,
-  TDeleteSiteByIdRequestParams,
-  TGetSiteByIdRequestParams,
   TListSiteRequestQuery,
-  TUpdateSiteByIdRequestParams,
   TUpdateSiteRequestBody,
   TUpsertSiteRequestBody,
 } from './site.entity';
@@ -26,7 +23,6 @@ import {
 } from '@/core/base/domain/entities';
 import {
   CreateValidator,
-  IDValidator,
   IDsValidator,
   UpdateValidator,
 } from '@/core/base/domain/entities/validator.entity';
@@ -98,18 +94,6 @@ export class CreateSiteValidator
   })
   location: string;
 }
-
-export class UpdateSiteParamsValidator
-  extends IDValidator
-  implements TUpdateSiteByIdRequestParams {}
-
-export class GetSiteParamsValidator
-  extends IDValidator
-  implements TGetSiteByIdRequestParams {}
-
-export class DeleteSiteParamsValidator
-  extends IDValidator
-  implements TDeleteSiteByIdRequestParams {}
 
 export class DeleteSiteBatchBodyValidator extends IDsValidator {}
 

@@ -15,10 +15,7 @@ import { User, Prisma } from '@prisma/client';
 import { Expose, Type } from 'class-transformer';
 import {
   TCreateUserRequestBody,
-  TDeleteUserByIdRequestParams,
-  TGetUserByIdRequestParams,
   TListUserRequestQuery,
-  TUpdateUserByIdRequestParams,
   TUpdateUserRequestBody,
   TUpsertUserRequestBody,
 } from './user.entity';
@@ -32,7 +29,6 @@ import {
 } from '@/core/base/domain/entities';
 import {
   CreateValidator,
-  IDValidator,
   IDsValidator,
   UpdateValidator,
 } from '@/core/base/domain/entities/validator.entity';
@@ -174,18 +170,6 @@ export class CreateUserValidator
 export class UpsertUserValidator
   extends CreateUserValidator
   implements TUpsertUserRequestBody {}
-
-export class UpdateUserParamsValidator
-  extends IDValidator
-  implements TUpdateUserByIdRequestParams {}
-
-export class GetUserParamsValidator
-  extends IDValidator
-  implements TGetUserByIdRequestParams {}
-
-export class DeleteUserParamsValidator
-  extends IDValidator
-  implements TDeleteUserByIdRequestParams {}
 
 export class DeleteUserBatchBodyValidator extends IDsValidator {}
 
