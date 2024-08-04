@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { OtelMethodCounter, Span } from 'nestjs-otel';
+import { OtelMethodCounter, Span, TraceService } from 'nestjs-otel';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { BaseUseCase } from '../../../../core/base/domain/usecase/base.usecase';
 import { RoleRepository } from '../../data/role.repository';
@@ -31,8 +31,9 @@ export class RoleUseCase extends BaseUseCase<
   constructor(
     protected repository: RoleRepository,
     db: PrismaService,
+    traceService: TraceService,
   ) {
-    super(repository, db);
+    super(repository, db, traceService);
   }
 
   @OtelMethodCounter()
@@ -41,8 +42,9 @@ export class RoleUseCase extends BaseUseCase<
     ctx: IContext,
     body: TUpsertRoleRequestBody,
   ): Promise<Role> {
+    const span = this.traceService.getSpan();
     try {
-      return await this.db.$transaction(async (tx) => {
+      const result = await this.db.$transaction(async (tx) => {
         const create: Prisma.RoleCreateInput = {
           description: body.description,
           name: body.name,
@@ -64,6 +66,7 @@ export class RoleUseCase extends BaseUseCase<
           },
         };
 
+        span?.addEvent('store the roles data');
         return await this.repository.upsert(
           true,
           ctx,
@@ -73,7 +76,11 @@ export class RoleUseCase extends BaseUseCase<
           update,
         );
       });
+
+      span?.setStatus({ code: 1, message: 'usecase finish!' });
+      return result;
     } catch (error: any) {
+      span?.setStatus({ code: 2, message: error.message });
       if (error instanceof PrismaClientKnownRequestError) {
         log.error(error.message);
         throw new UnknownException({
@@ -97,8 +104,10 @@ export class RoleUseCase extends BaseUseCase<
     ctx: IContext,
     body: TCreateRoleRequestBody,
   ): Promise<Role> {
+    const span = this.traceService.getSpan();
+
     try {
-      return await this.db.$transaction(async (tx) => {
+      const result = await this.db.$transaction(async (tx) => {
         const bodyModified: Prisma.RoleCreateInput = {
           description: body.description,
           name: body.name,
@@ -109,9 +118,14 @@ export class RoleUseCase extends BaseUseCase<
           },
         };
 
+        span?.addEvent('store the roles data');
         return await this.repository.create(true, ctx, bodyModified, tx);
       });
+
+      span?.setStatus({ code: 1, message: 'usecase finish!' });
+      return result;
     } catch (error: any) {
+      span?.setStatus({ code: 2, message: error.message });
       if (error instanceof PrismaClientKnownRequestError) {
         log.error(error.message);
         throw new UnknownException({
@@ -137,8 +151,9 @@ export class RoleUseCase extends BaseUseCase<
     id: string,
     body: TUpdateRoleRequestBody,
   ): Promise<Role> {
+    const span = this.traceService.getSpan();
     try {
-      return await this.db.$transaction(async (tx) => {
+      const result = await this.db.$transaction(async (tx) => {
         await this.repository.getById(id, tx);
 
         const bodyModified: Prisma.RoleUpdateInput = {
@@ -152,9 +167,14 @@ export class RoleUseCase extends BaseUseCase<
           },
         };
 
+        span?.addEvent('store the roles data');
         return await this.repository.update(true, ctx, id, bodyModified, tx);
       });
+
+      span?.setStatus({ code: 1, message: 'usecase finish!' });
+      return result;
     } catch (error: any) {
+      span?.setStatus({ code: 2, message: error.message });
       if (error instanceof PrismaClientKnownRequestError) {
         log.error(error.message);
         throw new UnknownException({

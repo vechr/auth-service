@@ -9,6 +9,7 @@ import { camelize } from '../frameworks/shared/utils/string.util';
 import { DeleteHelper, ReadHelper, WriteHelper } from './helpers';
 import { Prisma } from '@prisma/client';
 import { Audit, AuditList } from '../domain/entities/audit.entity';
+import { OtelMethodCounter, Span } from 'nestjs-otel';
 
 /**
  * ## BaseRepository
@@ -48,6 +49,8 @@ export abstract class BaseRepository<
     this.cacheManager = cacheManager;
   }
 
+  @OtelMethodCounter()
+  @Span('listDropdown')
   async listDropdown(
     ctx: IContext,
     tx: TPrismaTx,
@@ -55,6 +58,8 @@ export abstract class BaseRepository<
     return ReadHelper.listDropDown<Entity>(ctx, tx, this._entity);
   }
 
+  @OtelMethodCounter()
+  @Span('upsert repository')
   async upsert(
     isAudited: boolean,
     ctx: IContext,
@@ -87,6 +92,8 @@ export abstract class BaseRepository<
     );
   }
 
+  @OtelMethodCounter()
+  @Span('create repository')
   async create(
     isAudited: boolean,
     ctx: IContext,
@@ -107,10 +114,14 @@ export abstract class BaseRepository<
     );
   }
 
+  @OtelMethodCounter()
+  @Span('upsert')
   async createMany(body: any, tx: TPrismaTx): Promise<Prisma.BatchPayload> {
     return WriteHelper.createMany<CreateMany>(body, tx, this._entity);
   }
 
+  @OtelMethodCounter()
+  @Span('update repository')
   async update(
     isAudited: boolean,
     ctx: IContext,
@@ -135,6 +146,8 @@ export abstract class BaseRepository<
     );
   }
 
+  @OtelMethodCounter()
+  @Span('delete repository')
   async delete(
     isAudited: boolean,
     ctx: IContext,
@@ -157,6 +170,8 @@ export abstract class BaseRepository<
     );
   }
 
+  @OtelMethodCounter()
+  @Span('deleteBatch repostitory')
   async deleteBatch(
     ids: string[],
     tx: TPrismaTx,
@@ -171,6 +186,8 @@ export abstract class BaseRepository<
     );
   }
 
+  @OtelMethodCounter()
+  @Span('getById repository')
   async getById(
     id: string,
     tx: TPrismaTx,
@@ -187,6 +204,8 @@ export abstract class BaseRepository<
     );
   }
 
+  @OtelMethodCounter()
+  @Span('get repository')
   async get(
     tx: TPrismaTx,
     where?: Where,
@@ -202,6 +221,8 @@ export abstract class BaseRepository<
     );
   }
 
+  @OtelMethodCounter()
+  @Span('getMany repository')
   async getMany(
     tx: TPrismaTx,
     include?: Include,
@@ -217,6 +238,8 @@ export abstract class BaseRepository<
     );
   }
 
+  @OtelMethodCounter()
+  @Span('listCursor repository')
   async listCursor(
     ctx: IContext,
     tx: TPrismaTx,
@@ -232,6 +255,8 @@ export abstract class BaseRepository<
     );
   }
 
+  @OtelMethodCounter()
+  @Span('listPagination repository')
   async listPagination(
     ctx: IContext,
     tx: TPrismaTx,
@@ -245,6 +270,8 @@ export abstract class BaseRepository<
     );
   }
 
+  @OtelMethodCounter()
+  @Span('getAudits repository')
   async getAudits(
     ctx: IContext,
     tx: TPrismaTx,
@@ -270,6 +297,8 @@ export abstract class BaseRepository<
     );
   }
 
+  @OtelMethodCounter()
+  @Span('getAudit repository')
   async getAudit(tx: TPrismaTx, id: string): Promise<Audit | null> {
     return await tx.audit.findUnique({
       where: {

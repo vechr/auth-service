@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Span } from 'nestjs-otel';
+import { OtelMethodCounter, Span, TraceService } from 'nestjs-otel';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import dayjs from 'dayjs';
 import { instanceToPlain } from 'class-transformer';
@@ -44,8 +44,9 @@ export class SessionUseCase extends BaseUseCase<
     private readonly sessionRepository: SessionRepository,
     private readonly userRepository: UserRepository,
     db: PrismaService,
+    traceService: TraceService,
   ) {
-    super(sessionRepository, db);
+    super(sessionRepository, db, traceService);
     this.userRepository = userRepository;
   }
 
@@ -58,6 +59,11 @@ export class SessionUseCase extends BaseUseCase<
    * @returns TCompactAuthUser
    */
   private convertToCompactAuthUser(user: UserFull): TCompactAuthUser {
+    const span = this.traceService.startSpan(
+      'start convert user to compact user',
+    );
+
+    span.addEvent('generate unique permissions');
     const permissions = this.generateUniquePermissions({
       roles: user.roles,
     });
@@ -75,6 +81,8 @@ export class SessionUseCase extends BaseUseCase<
       siteId: user.site.id,
     };
 
+    span.setStatus({ code: 1, message: 'usecase finish!' });
+    span.end();
     return parsedUser;
   }
 
@@ -100,14 +108,21 @@ export class SessionUseCase extends BaseUseCase<
     );
   };
 
-  @Span('usecase session logout')
+  @OtelMethodCounter()
+  @Span('logout usecase')
   async logout(userId: string): Promise<void> {
+    const span = this.traceService.getSpan();
     try {
-      return await this.db.$transaction(async (tx) => {
+      const result = await this.db.$transaction(async (tx) => {
+        span?.addEvent('call the repository of delete by user id');
         await this.sessionRepository.deleteByUserId(userId, tx);
       });
+
+      span?.setStatus({ code: 1, message: 'usecase finish!' });
+      return result;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
+        span?.setStatus({ code: 2, message: error.message });
         log.error(error.message);
         throw new UnknownException({
           code: EErrorCommonCode.INTERNAL_SERVER_ERROR,
@@ -119,8 +134,10 @@ export class SessionUseCase extends BaseUseCase<
     }
   }
 
-  @Span('usecase refresh token')
+  @OtelMethodCounter()
+  @Span('refreshToken usecase')
   async refreshToken(ctx: IContext): Promise<Session> {
+    const span = this.traceService.getSpan();
     // Check whether the refresh token exists!
     const refreshToken = ctx.refreshToken;
 
@@ -139,6 +156,7 @@ export class SessionUseCase extends BaseUseCase<
     try {
       return await this.db.$transaction(async (tx) => {
         // Check whether current session is still exist, find by refresh token!
+        span?.addEvent('find refresh token if exsist on refresh token usecase');
         const currentSession = await this.sessionRepository.findByRefreshToken(
           refreshToken,
           tx,
@@ -157,6 +175,7 @@ export class SessionUseCase extends BaseUseCase<
         }
 
         // Regenerate JWT Token
+        span?.addEvent('re-generate jwt on refresh token usecase');
         const jwt = await generateJwt({
           origin: ctx.headers?.['origin'] || 'http://localhost',
           userId: currentSession.userId,
@@ -164,6 +183,7 @@ export class SessionUseCase extends BaseUseCase<
         });
 
         // Update the current session by refresh token, to update the token
+        span?.addEvent('update the refresh token on refresh token usecase');
         const session = await this.sessionRepository.updateByRefreshToken(
           {
             data: { user: instanceToPlain(user), headers },
@@ -176,9 +196,11 @@ export class SessionUseCase extends BaseUseCase<
           tx,
         );
 
+        span?.setStatus({ code: 1, message: 'usecase finish!' });
         return session;
       });
-    } catch (error) {
+    } catch (error: any) {
+      span?.setStatus({ code: 2, message: error.message });
       if (error instanceof PrismaClientKnownRequestError) {
         log.error(error.message);
         throw new UnknownException({
@@ -191,8 +213,10 @@ export class SessionUseCase extends BaseUseCase<
     }
   }
 
-  @Span('usecase session login')
+  @OtelMethodCounter()
+  @Span('login usecase')
   async login(ctx: IContext, body: TLoginSession): Promise<Session> {
+    const span = this.traceService.getSpan();
     const headers = Object.assign({}, ctx.headers);
 
     // delete unused headers
@@ -203,6 +227,7 @@ export class SessionUseCase extends BaseUseCase<
     try {
       return await this.db.$transaction(async (tx) => {
         // get the full of user from user repository
+        span?.addEvent('get full user by name on login usecase');
         const user = await this.userRepository.getFullByName(body.username, tx);
 
         // Check whether user exists!. If not throw an error NotFound
@@ -211,6 +236,7 @@ export class SessionUseCase extends BaseUseCase<
         }
 
         // Check whether the password is match with the database
+        span?.addEvent('check the password on login usecase');
         const isMatch = await checkPassword(body.password, user.password);
 
         // If not match throw an Error WrongPassword!
@@ -219,9 +245,11 @@ export class SessionUseCase extends BaseUseCase<
         }
 
         // Simplify the user data!
+        span?.addEvent('convert user to compact on login usecase');
         const customUser = this.convertToCompactAuthUser(user);
 
         // Generate JWT Token!
+        span?.addEvent('generate jwt on login usecase');
         const jwt = await generateJwt({
           origin: ctx.headers?.['origin'] || 'http://localhost',
           user: customUser,
@@ -229,6 +257,7 @@ export class SessionUseCase extends BaseUseCase<
         });
 
         // Store session data into database!
+        span?.addEvent('store and create session on login usecase');
         const session = await this.repository.create(
           false,
           ctx,
@@ -246,9 +275,11 @@ export class SessionUseCase extends BaseUseCase<
           tx,
         );
 
+        span?.setStatus({ code: 1, message: 'usecase finish!' });
         return session;
       });
     } catch (error: any) {
+      span?.setStatus({ code: 2, message: error.message });
       if (error instanceof PrismaClientKnownRequestError) {
         log.error(error.message);
         throw new UnknownException({

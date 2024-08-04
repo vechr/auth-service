@@ -4,7 +4,7 @@ import { BaseUseCase } from '../../../../core/base/domain/usecase/base.usecase';
 import { PermissionRepository } from '../../data/permission.repository';
 import { Permission } from '../entities/permission.entity';
 import { Prisma } from '@prisma/client';
-import { OtelMethodCounter, Span } from 'nestjs-otel';
+import { OtelMethodCounter, Span, TraceService } from 'nestjs-otel';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { log } from '@/core/base/frameworks/shared/utils/log.util';
 import {
@@ -31,21 +31,28 @@ export class PermissionUseCase extends BaseUseCase<
   constructor(
     protected repository: PermissionRepository,
     db: PrismaService,
+    traceService: TraceService,
   ) {
-    super(repository, db);
+    super(repository, db, traceService);
   }
 
-  @Span('usecase all permissions')
   @OtelMethodCounter()
+  @Span('allPermissions usecase')
   async allPermissions(): Promise<Pick<Permission, 'id' | 'alias'>[]> {
+    const span = this.traceService.getSpan();
     try {
-      return await this.db.$transaction(async (tx) => {
+      const result = await this.db.$transaction(async (tx) => {
+        span?.addEvent('call repository of get many');
         return await this.repository.getMany(tx, undefined, {
           id: true,
           alias: true,
         });
       });
+
+      span?.setStatus({ code: 1, message: 'usecase finish!' });
+      return result;
     } catch (error: any) {
+      span?.setStatus({ code: 2, message: error.message });
       if (error instanceof PrismaClientKnownRequestError) {
         log.error(error.message);
         throw new UnknownException({
