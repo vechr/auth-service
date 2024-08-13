@@ -44,7 +44,7 @@ export class UserUseCase extends BaseUseCase<
   }
 
   @OtelMethodCounter()
-  @Span('usecase create user')
+  @Span('usecase upsert user')
   override async upsert(
     ctx: IContext,
     body: TUpsertUserRequestBody,
@@ -80,6 +80,7 @@ export class UserUseCase extends BaseUseCase<
             connect: { id: body.siteId },
           },
           roles: {
+            deleteMany: {},
             create: body.roles.map((role) => ({
               role: { connect: { id: role } },
             })),

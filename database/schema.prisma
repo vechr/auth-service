@@ -27,7 +27,7 @@ model Audit {
   action      AuditAction
   username    String?     @db.VarChar(50)
   userId      String      @db.VarChar(36)
-  createdAt     DateTime    @default(now())
+  createdAt   DateTime    @default(now())
 
   @@index([auditable, auditableId])
   @@index([userId])
@@ -35,14 +35,15 @@ model Audit {
 }
 
 model Site {
-  id          String   @id @default(uuid()) @db.VarChar(36)
-  code        String   @unique @db.VarChar(15)
-  name        String   @db.VarChar(50)
-  location    String   @db.Text
-  description String?  @db.Text
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  users       User[]
+  id          String  @id @default(uuid()) @db.VarChar(36)
+  name        String  @unique @db.VarChar(50)
+  description String? @db.Text
+
+  code      String   @db.VarChar(15)
+  location  String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     User[]
 
   @@map("Site")
 }
@@ -52,12 +53,12 @@ model User {
   name        String  @unique @db.VarChar(50)
   description String? @db.Text
 
-  fullName    String?       @db.VarChar(100)
-  email       String?      @db.VarChar(50)
-  phoneNumber String?      @db.VarChar(15)
-  password    String       @db.Text
-  site        Site?        @relation(fields: [siteId], references: [id])
-  siteId      String       @db.VarChar(36)
+  fullName    String?    @db.VarChar(100)
+  email       String?    @db.VarChar(50)
+  phoneNumber String?    @db.VarChar(15)
+  password    String     @db.Text
+  site        Site?      @relation(fields: [siteId], references: [id])
+  siteId      String     @db.VarChar(36)
   roles       UserRole[]
   sessions    Session[]
 
@@ -72,7 +73,7 @@ model Permission {
   name        String  @unique @db.VarChar(50)
   description String? @db.Text
 
-  alias String             @unique @db.VarChar(50)
+  alias String           @unique @db.VarChar(50)
   role  RolePermission[]
 
   createdAt DateTime @default(now())

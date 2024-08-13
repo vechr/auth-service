@@ -14,12 +14,14 @@ const users = async (): Promise<TUserSeed> => [
     update: {
       id: '9fc509dd-2cae-433e-b9ee-705d92c56d9c',
       site: {
-        connect: { code: appConfig.INITIAL_SITE.code },
+        connect: { name: appConfig.INITIAL_SITE.name },
       },
       fullName: appConfig.INITIAL_SUPERUSER.fullName,
       email: appConfig.INITIAL_SUPERUSER.email,
       phoneNumber: appConfig.INITIAL_SUPERUSER.phoneNumber,
-      password: await generatePassword(appConfig.INITIAL_SUPERUSER.password || 'password'),
+      password: await generatePassword(
+        appConfig.INITIAL_SUPERUSER.password || 'password',
+      ),
       name: appConfig.INITIAL_SUPERUSER.name,
       roles: {
         deleteMany: {},
@@ -33,12 +35,14 @@ const users = async (): Promise<TUserSeed> => [
     create: {
       id: '9fc509dd-2cae-433e-b9ee-705d92c56d9c',
       site: {
-        connect: { code: appConfig.INITIAL_SITE.code },
+        connect: { name: appConfig.INITIAL_SITE.name },
       },
       fullName: appConfig.INITIAL_SUPERUSER.fullName,
       email: appConfig.INITIAL_SUPERUSER.email,
       phoneNumber: appConfig.INITIAL_SUPERUSER.phoneNumber,
-      password: await generatePassword(appConfig.INITIAL_SUPERUSER.password || 'password'),
+      password: await generatePassword(
+        appConfig.INITIAL_SUPERUSER.password || 'password',
+      ),
       name: appConfig.INITIAL_SUPERUSER.name,
       roles: {
         createMany: {
