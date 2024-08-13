@@ -56,7 +56,7 @@ const appServer = new Promise(async (resolve, reject) => {
     });
 
     // Set prefix api globally
-    app.setGlobalPrefix('api', { exclude: ['health', '/'] });
+    app.setGlobalPrefix('api/auth');
 
     // Enable CORS for security
     app.enableCors({
@@ -74,7 +74,7 @@ const appServer = new Promise(async (resolve, reject) => {
 
     // Versioning of default URL V1
     app.enableVersioning({
-      defaultVersion: '1/auth',
+      defaultVersion: '1',
       type: VersioningType.URI,
     });
 
@@ -116,7 +116,7 @@ const appServer = new Promise(async (resolve, reject) => {
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('/api/auth', app, document, option);
+    SwaggerModule.setup('/api/auth/docs', app, document, option);
 
     // Ignore Favicon
     app.use(ignoreFavicon);
@@ -149,7 +149,7 @@ const appServer = new Promise(async (resolve, reject) => {
 })();
 
 function ignoreFavicon(req: any, res: any, next: any) {
-  if (req.originalUrl.includes('favicon.ico')) {
+  if (req.originalUrl.includes('/favicon.ico')) {
     res.status(204).end();
   }
   next();
