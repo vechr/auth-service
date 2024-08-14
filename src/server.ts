@@ -119,7 +119,19 @@ const appServer = new Promise(async (resolve, reject) => {
     SwaggerModule.setup('/api/auth/docs', app, document, option);
 
     // Ignore Favicon
-    app.use(ignoreFavicon);
+    app.use(function (
+      req: { originalUrl: string },
+      res: { sendStatus: (arg0: number) => any },
+      next: () => void,
+    ) {
+      if (
+        req.originalUrl &&
+        req.originalUrl.split('/').pop() === 'favicon.ico'
+      ) {
+        return res.sendStatus(204);
+      }
+      next();
+    });
 
     const port = process.env.PORT ?? appConfig.APP_PORT;
 
@@ -147,10 +159,3 @@ const appServer = new Promise(async (resolve, reject) => {
   if (appConfig.OTLP_HTTP_URL && appConfig.OTLP_HTTP_URL != '') otelSDK.start();
   await Promise.all([appServer]);
 })();
-
-function ignoreFavicon(req: any, res: any, next: any) {
-  if (req.originalUrl.includes('/favicon.ico')) {
-    res.status(204).end();
-  }
-  next();
-}
