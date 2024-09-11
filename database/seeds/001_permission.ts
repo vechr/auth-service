@@ -1,4 +1,4 @@
-import { Permission, PermissionType } from '@prisma/client';
+import { Permission } from '@prisma/client';
 
 type TPermissionSeed = {
   where: Partial<Permission>;
@@ -15,7 +15,17 @@ const permissions: TPermissionSeed = [
       alias: 'root',
       name: 'superuser',
       description: 'full access to the whole system',
-      permissionType: PermissionType.Security,
+    },
+  },
+  // audit
+  {
+    where: { alias: 'audit:read@auth' },
+    update: {},
+    create: {
+      id: '4f189165-d56d-4f71-a087-03f8838b5059',
+      alias: 'audit:read@auth',
+      name: 'read audit',
+      description: 'access to read audit',
     },
   },
   // users module
@@ -27,7 +37,6 @@ const permissions: TPermissionSeed = [
       alias: 'users:create@auth',
       name: 'create user',
       description: 'access to create new user',
-      permissionType: PermissionType.Security,
     },
   },
   {
@@ -38,7 +47,6 @@ const permissions: TPermissionSeed = [
       alias: 'users:read@auth',
       name: 'read user',
       description: 'access to read user data',
-      permissionType: PermissionType.Security,
     },
   },
   {
@@ -49,7 +57,6 @@ const permissions: TPermissionSeed = [
       alias: 'users:update@auth',
       name: 'update specific user',
       description: 'access to update specific user data',
-      permissionType: PermissionType.Security,
     },
   },
   {
@@ -60,7 +67,6 @@ const permissions: TPermissionSeed = [
       alias: 'users:delete@auth',
       name: 'delete user',
       description: 'access to delete user',
-      permissionType: PermissionType.Security,
     },
   },
   // roles module
@@ -72,7 +78,6 @@ const permissions: TPermissionSeed = [
       alias: 'roles:create@auth',
       name: 'create roles',
       description: 'access to create new role',
-      permissionType: PermissionType.Security,
     },
   },
   {
@@ -81,9 +86,8 @@ const permissions: TPermissionSeed = [
     create: {
       id: '9fa2361f-5441-451b-a613-e3d888d7b4a9',
       alias: 'roles:read@auth',
-      name: 'read user',
+      name: 'read roles',
       description: 'access to read role data',
-      permissionType: PermissionType.Security,
     },
   },
   {
@@ -92,9 +96,8 @@ const permissions: TPermissionSeed = [
     create: {
       id: '26623b58-db0b-427f-8c4c-556dd2d78f99',
       alias: 'roles:update@auth',
-      name: 'update specific user',
+      name: 'update specific roles',
       description: 'access to update specific role data',
-      permissionType: PermissionType.Security,
     },
   },
   {
@@ -103,9 +106,8 @@ const permissions: TPermissionSeed = [
     create: {
       id: '6c80b595-90b9-4f3b-83b6-71c1dab3154d',
       alias: 'roles:delete@auth',
-      name: 'delete user',
+      name: 'delete roles',
       description: 'access to delete role',
-      permissionType: PermissionType.Security,
     },
   },
   // permissions module
@@ -117,7 +119,6 @@ const permissions: TPermissionSeed = [
       alias: 'permissions:read@auth',
       name: 'read permission',
       description: 'access to read permission',
-      permissionType: PermissionType.Security,
     },
   },
   // site module
@@ -129,7 +130,6 @@ const permissions: TPermissionSeed = [
       alias: 'sites:create@auth',
       name: 'create site',
       description: 'access to create new site',
-      permissionType: PermissionType.Security,
     },
   },
   {
@@ -140,7 +140,6 @@ const permissions: TPermissionSeed = [
       alias: 'sites:read@auth',
       name: 'read site',
       description: 'access to read site',
-      permissionType: PermissionType.Security,
     },
   },
   {
@@ -151,7 +150,6 @@ const permissions: TPermissionSeed = [
       alias: 'sites:update@auth',
       name: 'update specific site',
       description: 'access to update specific site data',
-      permissionType: PermissionType.Security,
     },
   },
   {
@@ -162,7 +160,6 @@ const permissions: TPermissionSeed = [
       alias: 'sites:delete@auth',
       name: 'delete site',
       description: 'access to delete site',
-      permissionType: PermissionType.Security,
     },
   },
   // Audit module
@@ -174,7 +171,6 @@ const permissions: TPermissionSeed = [
       alias: 'audit:read@auth',
       name: 'read audit',
       description: 'access to read audit',
-      permissionType: PermissionType.Security,
     },
   },
   // Dashboard Module
@@ -186,7 +182,6 @@ const permissions: TPermissionSeed = [
       alias: 'dashboards:read@auth',
       name: 'read dashboards',
       description: 'access to read dashboards',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -197,7 +192,6 @@ const permissions: TPermissionSeed = [
       alias: 'dashboards:create@auth',
       name: 'create dashboards',
       description: 'access to create dashboards',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -208,7 +202,6 @@ const permissions: TPermissionSeed = [
       alias: 'dashboards:update@auth',
       name: 'update dashboards',
       description: 'access to update dashboards',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -219,7 +212,6 @@ const permissions: TPermissionSeed = [
       alias: 'dashboards:delete@auth',
       name: 'delete dashboards',
       description: 'access to delete dashboards',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   // Device Module
@@ -231,7 +223,6 @@ const permissions: TPermissionSeed = [
       alias: 'devices:read@auth',
       name: 'read devices',
       description: 'access to read devices',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -242,7 +233,6 @@ const permissions: TPermissionSeed = [
       alias: 'devices:create@auth',
       name: 'create devices',
       description: 'access to create devices',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -253,7 +243,6 @@ const permissions: TPermissionSeed = [
       alias: 'devices:update@auth',
       name: 'update devices',
       description: 'access to update devices',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -264,7 +253,6 @@ const permissions: TPermissionSeed = [
       alias: 'devices:delete@auth',
       name: 'delete devices',
       description: 'access to delete devices',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   // Device Type Module
@@ -276,7 +264,6 @@ const permissions: TPermissionSeed = [
       alias: 'device-types:read@auth',
       name: 'read device type',
       description: 'access to read device type',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -287,7 +274,6 @@ const permissions: TPermissionSeed = [
       alias: 'device-types:create@auth',
       name: 'create device type',
       description: 'access to create device type',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -298,7 +284,6 @@ const permissions: TPermissionSeed = [
       alias: 'device-types:update@auth',
       name: 'update device type',
       description: 'access to update device type',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -309,7 +294,6 @@ const permissions: TPermissionSeed = [
       alias: 'device-types:delete@auth',
       name: 'delete device type',
       description: 'access to delete device type',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   // Topic Module
@@ -321,7 +305,6 @@ const permissions: TPermissionSeed = [
       alias: 'topics:read@auth',
       name: 'read topics',
       description: 'access to read topics',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -332,7 +315,6 @@ const permissions: TPermissionSeed = [
       alias: 'topics:create@auth',
       name: 'create topics',
       description: 'access to create topics',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -343,7 +325,6 @@ const permissions: TPermissionSeed = [
       alias: 'topics:update@auth',
       name: 'update topics',
       description: 'access to update topics',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -354,7 +335,6 @@ const permissions: TPermissionSeed = [
       alias: 'topics:delete@auth',
       name: 'delete topics',
       description: 'access to delete topics',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   // Topic Event Module
@@ -366,7 +346,6 @@ const permissions: TPermissionSeed = [
       alias: 'topic-events:read@auth',
       name: 'read topic event',
       description: 'access to read topic event',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -377,7 +356,6 @@ const permissions: TPermissionSeed = [
       alias: 'topic-events:create@auth',
       name: 'create topic event',
       description: 'access to create topic event',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -388,7 +366,6 @@ const permissions: TPermissionSeed = [
       alias: 'topic-events:update@auth',
       name: 'update topic event',
       description: 'access to update topic event',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -399,7 +376,6 @@ const permissions: TPermissionSeed = [
       alias: 'topic-events:delete@auth',
       name: 'delete topic event',
       description: 'access to delete topic event',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   // Widget Module
@@ -411,7 +387,6 @@ const permissions: TPermissionSeed = [
       alias: 'widgets:read@auth',
       name: 'read widgets',
       description: 'access to read widgets',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -422,7 +397,6 @@ const permissions: TPermissionSeed = [
       alias: 'widgets:create@auth',
       name: 'create widgets',
       description: 'access to create widgets',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -433,7 +407,6 @@ const permissions: TPermissionSeed = [
       alias: 'widgets:update@auth',
       name: 'update widgets',
       description: 'access to update widgets',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -444,7 +417,6 @@ const permissions: TPermissionSeed = [
       alias: 'widgets:delete@auth',
       name: 'delete widgets',
       description: 'access to delete widgets',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   // Email Notification
@@ -456,7 +428,6 @@ const permissions: TPermissionSeed = [
       alias: 'email-notifications:read@auth',
       name: 'read email notification',
       description: 'access to read email notification',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -467,7 +438,6 @@ const permissions: TPermissionSeed = [
       alias: 'email-notifications:create@auth',
       name: 'create email notification',
       description: 'access to create email notification',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -478,7 +448,6 @@ const permissions: TPermissionSeed = [
       alias: 'email-notifications:update@auth',
       name: 'update email notification',
       description: 'access to update email notification',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
   {
@@ -489,7 +458,6 @@ const permissions: TPermissionSeed = [
       alias: 'email-notifications:delete@auth',
       name: 'delete email notification',
       description: 'access to delete email notification',
-      permissionType: PermissionType.PhyscalModelling,
     },
   },
 ];

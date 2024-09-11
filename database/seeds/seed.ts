@@ -1,15 +1,28 @@
-import glob from 'glob';
+import { glob } from 'glob';
 import { PrismaClient } from '@prisma/client';
-import logger from 'pino';
-import prettyLogger from 'pino-pretty';
+import winston, { transports } from 'winston';
+import { utilities } from 'nest-winston';
 
-const log = logger(
-  prettyLogger({
-    colorize: true,
-    translateTime: 'SYS:dd/mm/yyyy HH:MM:ss',
-    ignore: 'pid,hostname',
+const winstonFormat = winston.format.combine(
+  winston.format.timestamp(),
+  winston.format.ms(),
+  utilities.format.nestLike('Prisma Seed', {
+    colors: true,
+    prettyPrint: true,
   }),
 );
+
+const consoleTransport = new transports.Console({
+  format: winstonFormat,
+});
+
+const winstonModuleOptions = {
+  levels: winston.config.npm.levels,
+  transports: [consoleTransport],
+};
+
+const log = winston.createLogger(winstonModuleOptions);
+
 const prisma = new PrismaClient();
 
 (async function () {
@@ -37,7 +50,7 @@ const prisma = new PrismaClient();
           log.info(`run seeding for ${fileName}`);
 
           await Promise.all(
-            seedData.map(async (data) => {
+            seedData.map(async (data: Record<string, any>) => {
               const modelName = fileName.split('_').slice().pop();
 
               if (modelName) {

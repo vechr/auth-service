@@ -1,5 +1,5 @@
 import { Site } from '@prisma/client';
-import appConstant from '../../src/constants/app.constant';
+import appConstant from '../../src/config/app.config';
 
 type TSiteSeed = {
   where: Partial<Site>;
@@ -9,7 +9,7 @@ type TSiteSeed = {
 
 const sites: TSiteSeed = [
   {
-    where: { code: appConstant.INITIAL_SITE.code },
+    where: { name: appConstant.INITIAL_SITE.name },
     update: {},
     create: {
       id: 'aa15c44d-ad6b-4bf8-b3e1-ef188761105e',

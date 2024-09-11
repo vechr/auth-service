@@ -1,29 +1,31 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import AuditAuthService from '../audits/audit.service';
-import RoleController from './role.controller';
-import RoleService from './role.service';
-import appConstant from '@/constants/app.constant';
+import appConfig from '@/config/app.config';
+import { RoleController } from './infrastructure/role.controller';
+import { RoleUseCase } from './domain/usecase/role.usecase';
+import { RoleRepository } from './data/role.repository';
+import PrismaService from '@/core/base/frameworks/data-services/prisma/prisma.service';
 
 @Module({
   imports: [
     ClientsModule.register([
       {
-        name: appConstant.NATS_SERVICE,
+        name: appConfig.NATS_SERVICE,
         transport: Transport.NATS,
         options: {
-          servers: [appConstant.NATS_URL],
+          servers: [appConfig.NATS_URL],
           maxReconnectAttempts: 10,
           tls: {
-            caFile: appConstant.NATS_CA,
-            keyFile: appConstant.NATS_KEY,
-            certFile: appConstant.NATS_CERT,
+            caFile: appConfig.NATS_CA,
+            keyFile: appConfig.NATS_KEY,
+            certFile: appConfig.NATS_CERT,
           },
         },
       },
     ]),
   ],
   controllers: [RoleController],
-  providers: [RoleService, AuditAuthService],
+  providers: [RoleUseCase, RoleRepository, PrismaService],
+  exports: [RoleRepository],
 })
 export default class RoleModule {}
