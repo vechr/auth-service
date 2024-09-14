@@ -35,6 +35,17 @@ export default class HealthController {
     return this.healthCheck();
   }
 
+  @Version(VERSION_NEUTRAL)
+  @Get()
+  @ApiOperation({
+    summary: 'This method is to check health of the application',
+  })
+  @HealthCheck()
+  @HttpCode(HttpStatus.OK)
+  check2() {
+    return this.healthCheck();
+  }
+
   private async healthCheck(): Promise<HealthCheckResult> {
     return this.health.check([
       () =>
