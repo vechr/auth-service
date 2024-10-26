@@ -18,6 +18,7 @@ const OpenTelemetryModuleConfig = OpenTelemetryModule.forRoot({
     hostMetrics: true,
     apiMetrics: {
       enable: true,
+      ignoreRoutes: ['/favicon.ico', '/health', '/'],
     },
   },
 });
