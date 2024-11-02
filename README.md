@@ -4,7 +4,7 @@
 
 # Edit your `.env` file
 ```
-DB_URL=postgresql://Vechr:123@postgres-db:5432/auth-db?schema=public&connect_timeout=300
+DB_URL=postgresql://Vechr:123@postgres-db:5432/auth_db?schema=public&connect_timeout=300
 INITIAL_SITE='{"code":"ST1","name":"Site Default","location":"Server Default"}'
 INITIAL_SUPERUSER='{"fullName":"root","username": "root","emailAddress":"root@vechr.id","phoneNumber":"+62","password":"password123"}'
 JWT_SECRET=secretvechr
